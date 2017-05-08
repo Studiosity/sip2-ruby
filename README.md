@@ -24,6 +24,11 @@ $ bundle
 ```
 
 
+## Protocol support
+
+So far only login (code 93) and patron_information (code 63) are supported
+
+
 ## Usage
 
 ```ruby
