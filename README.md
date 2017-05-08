@@ -26,7 +26,17 @@ $ bundle
 
 ## Usage
 
-TODO
+```ruby
+client = Sip2::Client.new(host: 'my.sip2.host.net', port: 6001)
+patron =
+  client.connect do |connection|
+    if connection.login 'sip_username', 'sip_password'
+      connection.patron_information 'patron_username', 'patron_password'
+    end
+  end
+
+puts 'Valid patron' if patron && patron.authenticated?
+```
 
 
 ## Contributing
