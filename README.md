@@ -1,5 +1,4 @@
 [![Travis Build Status](http://img.shields.io/travis/TutoringAustralasia/sip2-ruby.svg?style=flat)](https://travis-ci.org/TutoringAustralasia/sip2-ruby)
-[![Code Climate Score](http://img.shields.io/codeclimate/github/TutoringAustralasia/sip2-ruby.svg?style=flat)](https://codeclimate.com/github/TutoringAustralasia/sip2-ruby)
 [![Gem Version](http://img.shields.io/gem/v/sip2.svg?style=flat)](#)
 
 # 3M™ Standard Interchange Protocol v2 (SIP2) client implementation in Ruby
