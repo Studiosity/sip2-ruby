@@ -2,10 +2,16 @@ require 'socket'
 
 module Sip2
   #
+  # Exception class for connection timeouts
+  #
+  class ConnectionTimeout < RuntimeError; end
+
+  #
   # Sip2 Non-blocking socket
   # From https://spin.atomicobject.com/2013/09/30/socket-connection-timeout-ruby/
   #
   class NonBlockingSocket
+
     # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
     def self.connect(host, port, timeout = 5)
       # Convert the passed host into structures the non-blocking calls can deal with
@@ -38,7 +44,7 @@ module Sip2
             # IO.select returns nil when the socket is not ready before timeout
             # seconds have elapsed
             socket.close
-            raise 'Connection timeout'
+            raise ConnectionTimeout
           end
         end
       end
