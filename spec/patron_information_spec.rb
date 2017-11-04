@@ -53,4 +53,21 @@ describe Sip2::PatronInformation do
       it { is_expected.to be_nil }
     end
   end
+
+  describe 'location' do
+    subject { patron_information.location }
+
+    let(:response) { 'FOO|AQMOON|BAR' }
+    it { is_expected.to eq 'MOON' }
+
+    context 'blank response' do
+      let(:response) { 'FOO|AQ|BAR' }
+      it { is_expected.to eq '' }
+    end
+
+    context 'no location information' do
+      let(:response) { 'FOO|BAR' }
+      it { is_expected.to be_nil }
+    end
+  end
 end
