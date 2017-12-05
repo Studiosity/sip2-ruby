@@ -10,15 +10,19 @@ module Sip2
     end
 
     def patron_valid?
-      raw_response[/\|BL([YN])\|/, 1] == 'Y'
+      parse_boolean raw_response, 'BL'
     end
 
     def authenticated?
-      raw_response[/\|CQ([YN])\|/, 1] == 'Y'
+      parse_boolean raw_response, 'CQ'
     end
 
     def email
-      raw_response[/\|BE(.*?)\|/, 1]
+      parse_text raw_response, 'BE'
+    end
+
+    def location
+      parse_text raw_response, 'AQ'
     end
 
     def inspect
@@ -30,6 +34,16 @@ module Sip2
         email,
         authenticated?
       )
+    end
+
+    private
+
+    def parse_boolean(response, message_id)
+      response[/\|#{message_id}([YN])\|/, 1] == 'Y'
+    end
+
+    def parse_text(response, message_id)
+      response[/\|#{message_id}(.*?)\|/, 1]
     end
   end
 end

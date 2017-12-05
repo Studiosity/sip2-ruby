@@ -35,7 +35,7 @@ module Sip2
               socket.connect_nonblock(sockaddr)
             rescue Errno::EISCONN # rubocop:disable Lint/HandleExceptions
               # Good news everybody, the socket is connected!
-            rescue
+            rescue StandardError
               # An unexpected exception was raised - the connection is no good.
               socket.close
               raise
