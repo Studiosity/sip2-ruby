@@ -20,7 +20,7 @@ module Sip2
 
       def handle_patron_information_response(response)
         return unless sequence_and_checksum_valid?(response)
-        Sip2::PatronInformation.new response
+        Sip2::Responses::PatronInformation.new response
       end
     end
   end

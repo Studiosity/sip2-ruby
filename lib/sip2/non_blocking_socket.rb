@@ -11,7 +11,6 @@ module Sip2
   # From https://spin.atomicobject.com/2013/09/30/socket-connection-timeout-ruby/
   #
   class NonBlockingSocket
-
     # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
     def self.connect(host, port, timeout = 5)
       # Convert the passed host into structures the non-blocking calls can deal with

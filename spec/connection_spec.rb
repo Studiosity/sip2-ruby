@@ -54,7 +54,7 @@ describe Sip2::Connection do
         expect(socket).to receive(:gets).with("\r").and_return response
 
         info = connection.patron_information('user_uid', 'passw0rd')
-        expect(info).to be_a Sip2::PatronInformation
+        expect(info).to be_a Sip2::Responses::PatronInformation
         expect(info.raw_response).to eq response
       end
     end
@@ -73,7 +73,7 @@ describe Sip2::Connection do
           expect(socket).to receive(:gets).with("\r").and_return response
 
           info = connection.patron_information('user_uid', 'passw0rd')
-          expect(info).to be_a Sip2::PatronInformation
+          expect(info).to be_a Sip2::Responses::PatronInformation
           expect(info.raw_response).to eq response
         end
       end
@@ -89,6 +89,68 @@ describe Sip2::Connection do
 
         info = connection.patron_information('user_uid', 'passw0rd')
         expect(info).to be_nil
+      end
+    end
+  end
+
+  describe '#build_patron_status_message' do
+    around do |example|
+      Timecop.freeze('2020-01-01 00:00:00') do
+        example.run
+      end
+    end
+
+    let(:username) { 'username' }
+    let(:pin) { 'pin' }
+
+    let(:valid_patron_status_line) { '2300020200101    000000AO|AAusername|AC|ADpin' }
+    let(:valid_patron_status_line_blank_pin) { '2300020200101    000000AO|AAusername|AC|AD' }
+    let(:valid_patron_status_line_no_pin) { '2300020200101    000000AO|AAusername|AC' }
+
+    subject { connection.send(:build_patron_status_message, username, pin) }
+
+    it 'builds the correct string' do
+      expect(subject).to eq(valid_patron_status_line)
+    end
+    context 'given a blank password/pin' do
+      let(:pin) { '' }
+      it 'adds the password field' do
+        expect(subject).to eq(valid_patron_status_line_blank_pin)
+      end
+    end
+    context 'given a nil password' do
+      let(:pin) { nil }
+      it 'does not send the password field' do
+        expect(subject).to eq(valid_patron_status_line_no_pin)
+      end
+    end
+  end
+
+  describe '#handle_patron_status_response' do
+    let(:response) { double(:response) }
+    subject { connection.send(:handle_patron_status_response, response) }
+
+    context 'if sequence_and_checksum_valid? returns false' do
+      before do
+        expect(connection).to receive(
+          :sequence_and_checksum_valid?
+        ).with(response) { false }
+      end
+      it 'should return nil' do
+        expect(subject).to be nil
+      end
+    end
+
+    context 'if sequence_and_checksum_valid? returns true' do
+      before do
+        expect(connection).to receive(
+          :sequence_and_checksum_valid?
+        ).with(response) { true }
+      end
+      it 'returns a PatronStatus response object' do
+        response_object = double(:response_object)
+        expect(Sip2::Responses::PatronStatus).to receive(:new) { response_object }
+        expect(subject).to eq response_object
       end
     end
   end
