@@ -63,7 +63,9 @@ module Sip2
       private
 
       def attributes_for_inspect
-        %i[fee_amount personal_name valid_patron? valid_patron_password?]
+        %i[fee_amount personal_name valid_patron? valid_patron_password? 
+           excessive_fines_or_fees? charge_privileges_denied? 
+           renewal_privileges_denied?]
       end
     end
   end
