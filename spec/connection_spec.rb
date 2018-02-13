@@ -91,6 +91,24 @@ describe Sip2::Connection do
         expect(info).to be_nil
       end
     end
+
+    context 'a terminal password is provided' do
+      it 'sends a well formed patron information packet to socket' do
+        Timecop.freeze do
+          timestamp = Time.now.strftime('%Y%m%d    %H%M%S')
+          request = "63000#{timestamp}          AO|AAuser_uid|ACt3rmp4ss|ADpassw0rd|AY1AZ"
+          request = request + checksum(request) + "\r"
+          expect(socket).to receive(:send).with request, 0
+
+          response = '64FOOBAR|AY1AZFBFB'
+          expect(socket).to receive(:gets).with("\r").and_return response
+
+          info = connection.patron_information('user_uid', 'passw0rd', 't3rmp4ss')
+          expect(info).to be_a Sip2::PatronInformation
+          expect(info.raw_response).to eq response
+        end
+      end
+    end
   end
 
   def checksum(message)
