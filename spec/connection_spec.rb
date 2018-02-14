@@ -45,7 +45,6 @@ describe Sip2::Connection do
   describe '#patron_information' do
     it 'sends a well formed patron information packet to socket' do
       Timecop.freeze do
-        timestamp = Time.now.strftime('%Y%m%d    %H%M%S')
         request = "63000#{timestamp}          AO|AAuser_uid|AC|ADpassw0rd|AY1AZ"
         request = request + checksum(request) + "\r"
         expect(socket).to receive(:send).with request, 0
@@ -64,7 +63,6 @@ describe Sip2::Connection do
 
       it 'returns patron information even if the checksum is wrong' do
         Timecop.freeze do
-          timestamp = Time.now.strftime('%Y%m%d    %H%M%S')
           request = "63000#{timestamp}          AO|AAuser_uid|AC|ADpassw0rd|AY1AZ"
           request = request + checksum(request) + "\r"
           expect(socket).to receive(:send).with request, 0
@@ -81,7 +79,6 @@ describe Sip2::Connection do
 
     context 'server responds with invalid packet' do
       it 'returns nil' do
-        timestamp = Time.now.strftime('%Y%m%d    %H%M%S')
         request = "63000#{timestamp}          AO|AAuser_uid|AC|ADpassw0rd|AY1AZ"
         request = request + checksum(request) + "\r"
         expect(socket).to receive(:send).with request, 0
@@ -95,7 +92,6 @@ describe Sip2::Connection do
     context 'a terminal password is provided' do
       it 'sends a well formed patron information packet to socket' do
         Timecop.freeze do
-          timestamp = Time.now.strftime('%Y%m%d    %H%M%S')
           request = "63000#{timestamp}          AO|AAuser_uid|ACt3rmp4ss|ADpassw0rd|AY1AZ"
           request = request + checksum(request) + "\r"
           expect(socket).to receive(:send).with request, 0
@@ -117,5 +113,10 @@ describe Sip2::Connection do
     check += "\0".ord
     check = (check ^ 0xFFFF) + 1
     format '%4.4X', check
+  end
+
+  def timestamp
+    # Rubocop disable is a false positive
+    Time.now.strftime('%Y%m%d    %H%M%S') # rubocop:disable Style/FormatStringToken
   end
 end

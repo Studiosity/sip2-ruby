@@ -27,12 +27,13 @@ module Sip2
 
     def inspect
       format(
-        '#<%s:0x%p @patron_valid="%s" @email="%s" @authenticated="%s">',
-        self.class.name,
-        object_id,
-        patron_valid?,
-        email,
-        authenticated?
+        '#<%<class_name>s:0x%<object_id>p @patron_valid="%<patron_valid>s"' \
+        ' @email="%<email>s" @authenticated="%<authenticated>s">',
+        class_name: self.class.name,
+        object_id: object_id,
+        patron_valid: patron_valid?,
+        email: email,
+        authenticated: authenticated?
       )
     end
 
