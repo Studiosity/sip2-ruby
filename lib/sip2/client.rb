@@ -11,10 +11,7 @@ module Sip2
 
     def connect
       socket = NonBlockingSocket.connect @host, @port
-      if block_given?
-        connection = Connection.new(socket, @ignore_error_detection)
-        yield connection
-      end
+      yield Connection.new(socket, @ignore_error_detection) if block_given?
     ensure
       socket.close if socket
     end

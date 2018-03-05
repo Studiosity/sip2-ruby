@@ -116,7 +116,6 @@ describe Sip2::Connection do
   end
 
   def timestamp
-    # Rubocop disable is a false positive
-    Time.now.strftime('%Y%m%d    %H%M%S') # rubocop:disable Style/FormatStringToken
+    Time.now.strftime('%Y%m%d    %H%M%S')
   end
 end

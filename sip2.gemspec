@@ -1,4 +1,4 @@
-lib = File.expand_path('../lib', __FILE__)
+lib = File.expand_path('lib', __dir__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 require 'sip2/version'
@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = '3M™ Standard Interchange Protocol v2 client implementation in Ruby'
   spec.description   = '3M™ Standard Interchange Protocol v2 client implementation in Ruby'
-  spec.homepage      = 'https://github.com/TutoringAustralasia/sip2-ruby'
+  spec.homepage      = 'https://github.com/Studiosity/sip2-ruby'
   spec.license       = 'MIT'
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(spec)/}) }
