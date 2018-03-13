@@ -40,6 +40,7 @@ module Sip2
       message = send "build_#{message_type}_message", *args
       message = with_checksum with_error_detection message
       response = send_message message
+      return if response.nil?
       send "handle_#{message_type}_response", response
     end
 
