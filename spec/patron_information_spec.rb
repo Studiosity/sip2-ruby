@@ -3,6 +3,47 @@ require 'spec_helper'
 describe Sip2::PatronInformation do
   let(:patron_information) { Sip2::PatronInformation.new response }
 
+  describe '#patron_status' do
+    subject { patron_information.patron_status }
+
+    let(:response) { '64       Not Bad00020180508    21454400000' }
+    it { is_expected.to eq 'Not Bad' }
+
+    context 'bad response' do
+      let(:response) { '63       Not Bad00020180508    21454400000' }
+      it { is_expected.to be_nil }
+    end
+  end
+
+  describe '#language_code' do
+    subject { patron_information.language_code }
+
+    let(:response) { '64       Not Bad00020180508    21454400000' }
+    it { is_expected.to eq '000' }
+
+    context 'bad response' do
+      let(:response) { '63       Not Bad00020180508    21454400000' }
+      it { is_expected.to be_nil }
+    end
+  end
+
+  describe '#transaction_date' do
+    subject { patron_information.transaction_date }
+
+    let(:response) { '64       Not Bad00020180508    21454400000' }
+    it { is_expected.to eq DateTime.new(2018, 5, 8, 21, 45, 44) }
+
+    context 'bad response' do
+      let(:response) { '63       Not Bad00020180508    21454400000' }
+      it { is_expected.to be_nil }
+    end
+
+    context 'different timezone' do
+      let(:response) { '64       Not Bad00020180508 CST21454400000' }
+      it { is_expected.to eq DateTime.new(2018, 5, 8, 21, 45, 44, '-6') }
+    end
+  end
+
   describe '#patron_valid?' do
     subject { patron_information.patron_valid? }
 
