@@ -22,8 +22,11 @@ module Sip2
       match = raw_response.match(/\A64.{17}(\d{4})(\d{2})(\d{2})(.{4})(\d{2})(\d{2})(\d{2})/)
       return unless match
       _, year, month, day, zone, hour, minute, second = match.to_a
-      offset = offset_from_zone(zone)
-      DateTime.new(year.to_i, month.to_i, day.to_i, hour.to_i, minute.to_i, second.to_i, offset)
+      Time.new(
+        year.to_i, month.to_i, day.to_i,
+        hour.to_i, minute.to_i, second.to_i,
+        offset_from_zone(zone)
+      )
     end
 
     def patron_valid?
@@ -67,36 +70,36 @@ module Sip2
     def offset_from_zone(zone)
       zone.strip!
       lookup = TIME_ZONE_LOOKUP_TABLE.find { |_, v| v.include? zone }
-      lookup ? lookup.first : '0'
+      lookup ? lookup.first : '+00:00'
     end
 
     TIME_ZONE_LOOKUP_TABLE = {
-      '-12' => %w[Y],
-      '-11' => %w[X BST],
-      '-10' => %w[W HST BDT],
-      '-9' => %w[V YST HDT],
-      '-8' => %w[U PST YDT],
-      '-7' => %w[T MST PDT],
-      '-6' => %w[S CST MDT],
-      '-5' => %w[R EST CDT],
-      '-4' => %w[Q AST EDT],
-      '-3' => %w[P ADT],
-      '-2' => %w[O],
-      '-1' => %w[N],
-      '0' => %w[Z GMT WET],
-      '+1' => %w[A CET BST],
-      '+2' => %w[B EET],
-      '+3' => %w[C],
-      '+4' => %w[D],
-      '+5' => %w[E],
-      '+6' => %w[F],
-      '+7' => %w[G],
-      '+8' => %w[H SST WST],
-      '+9' => %w[I JST],
-      '+10' => %w[K JDT],
-      '+11' => %w[L],
-      '+12' => %w[M NZST],
-      '+13' => %w[NZDT],
+      '-12:00' => %w[Y],
+      '-11:00' => %w[X BST],
+      '-10:00' => %w[W HST BDT],
+      '-09:00' => %w[V YST HDT],
+      '-08:00' => %w[U PST YDT],
+      '-07:00' => %w[T MST PDT],
+      '-06:00' => %w[S CST MDT],
+      '-05:00' => %w[R EST CDT],
+      '-04:00' => %w[Q AST EDT],
+      '-03:00' => %w[P ADT],
+      '-02:00' => %w[O],
+      '-01:00' => %w[N],
+      '+00:00' => %w[Z GMT WET],
+      '+01:00' => %w[A CET BST],
+      '+02:00' => %w[B EET],
+      '+03:00' => %w[C],
+      '+04:00' => %w[D],
+      '+05:00' => %w[E],
+      '+06:00' => %w[F],
+      '+07:00' => %w[G],
+      '+08:00' => %w[H SST WST],
+      '+09:00' => %w[I JST],
+      '+10:00' => %w[K JDT],
+      '+11:00' => %w[L],
+      '+12:00' => %w[M NZST],
+      '+13:00' => %w[NZDT]
     }.freeze
   end
 end

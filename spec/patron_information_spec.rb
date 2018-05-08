@@ -31,7 +31,7 @@ describe Sip2::PatronInformation do
     subject { patron_information.transaction_date }
 
     let(:response) { '64       Not Bad00020180508    21454400000' }
-    it { is_expected.to eq DateTime.new(2018, 5, 8, 21, 45, 44) }
+    it { is_expected.to eq Time.new(2018, 5, 8, 21, 45, 44, '+00:00') }
 
     context 'bad response' do
       let(:response) { '63       Not Bad00020180508    21454400000' }
@@ -40,7 +40,7 @@ describe Sip2::PatronInformation do
 
     context 'different timezone' do
       let(:response) { '64       Not Bad00020180508 CST21454400000' }
-      it { is_expected.to eq DateTime.new(2018, 5, 8, 21, 45, 44, '-6') }
+      it { is_expected.to eq Time.new(2018, 5, 8, 21, 45, 44, '-06:00') }
     end
   end
 
