@@ -9,13 +9,64 @@ module Sip2
       @raw_response = patron_response
     end
 
-    def patron_status
-      status = raw_response[/\A64(.{14})/, 1]
-      status.strip if status
+    def charge_privileges_denied?
+      parse_patron_status 0
     end
 
-    def language_code
-      raw_response[/\A64.{14}(.{3})/, 1]
+    def renewal_privileges_denied?
+      parse_patron_status 1
+    end
+
+    def recall_privileges_denied?
+      parse_patron_status 2
+    end
+
+    def hold_privileges_denied?
+      parse_patron_status 3
+    end
+
+    def card_reported_lost?
+      parse_patron_status 4
+    end
+
+    def too_many_items_charged?
+      parse_patron_status 5
+    end
+
+    def too_many_items_overdue?
+      parse_patron_status 6
+    end
+
+    def too_many_renewals?
+      parse_patron_status 7
+    end
+
+    def too_many_claims_of_items_returned?
+      parse_patron_status 8
+    end
+
+    def too_many_items_lost?
+      parse_patron_status 9
+    end
+
+    def excessive_outstanding_fines?
+      parse_patron_status 10
+    end
+
+    def excessive_outstanding_fees?
+      parse_patron_status 11
+    end
+
+    def recall_overdue?
+      parse_patron_status 12
+    end
+
+    def too_many_items_billed?
+      parse_patron_status 13
+    end
+
+    def language
+      LANGUAGE_LOOKUP_TABLE[parse_fixed_response(14, 3)]
     end
 
     def transaction_date
@@ -30,19 +81,23 @@ module Sip2
     end
 
     def patron_valid?
-      parse_boolean raw_response, 'BL'
+      parse_boolean 'BL'
     end
 
     def authenticated?
-      parse_boolean raw_response, 'CQ'
+      parse_boolean 'CQ'
     end
 
     def email
-      parse_text raw_response, 'BE'
+      parse_text 'BE'
     end
 
     def location
-      parse_text raw_response, 'AQ'
+      parse_text 'AQ'
+    end
+
+    def screen_message
+      parse_text 'AF'
     end
 
     def inspect
@@ -59,12 +114,20 @@ module Sip2
 
     private
 
-    def parse_boolean(response, message_id)
-      response[/\|#{message_id}([YN])\|/, 1] == 'Y'
+    def parse_boolean(message_id)
+      raw_response[/\|#{message_id}([YN])\|/, 1] == 'Y'
     end
 
-    def parse_text(response, message_id)
-      response[/\|#{message_id}(.*?)\|/, 1]
+    def parse_text(message_id)
+      raw_response[/\|#{message_id}(.*?)\|/, 1]
+    end
+
+    def parse_patron_status(position)
+      parse_fixed_response(position) == 'Y'
+    end
+
+    def parse_fixed_response(position, count = 1)
+      raw_response[/\A64.{#{position}}(.{#{count}})/, 1]
     end
 
     def offset_from_zone(zone)
@@ -100,6 +163,37 @@ module Sip2
       '+11:00' => %w[L],
       '+12:00' => %w[M NZST],
       '+13:00' => %w[NZDT]
+    }.freeze
+
+    LANGUAGE_LOOKUP_TABLE = {
+      '000' => 'Unknown',
+      '001' => 'English',
+      '002' => 'French',
+      '003' => 'German',
+      '004' => 'Italian',
+      '005' => 'Dutch',
+      '006' => 'Swedish',
+      '007' => 'Finnish',
+      '008' => 'Spanish',
+      '009' => 'Danish',
+      '010' => 'Portuguese',
+      '011' => 'Canadian-French',
+      '012' => 'Norwegian',
+      '013' => 'Hebrew',
+      '014' => 'Japanese',
+      '015' => 'Russian',
+      '016' => 'Arabic',
+      '017' => 'Polish',
+      '018' => 'Greek',
+      '019' => 'Chinese',
+      '020' => 'Korean',
+      '021' => 'North American Spanish',
+      '022' => 'Tamil',
+      '023' => 'Malay',
+      '024' => 'United Kingdom',
+      '025' => 'Icelandic',
+      '026' => 'Belgian',
+      '027' => 'Taiwanese'
     }.freeze
   end
 end
