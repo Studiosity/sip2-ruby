@@ -11,13 +11,13 @@ module Sip2
     SEPARATOR = "\r".freeze
 
     def send_with_timeout(message, separator = SEPARATOR)
-      ::Timeout::timeout (connection_timeout || DEFAULT_TIMEOUT), WriteTimeout do
+      ::Timeout.timeout (connection_timeout || DEFAULT_TIMEOUT), WriteTimeout do
         send message + separator, 0
       end
     end
 
     def gets_with_timeout(separator = SEPARATOR)
-      ::Timeout::timeout (connection_timeout || DEFAULT_TIMEOUT), ReadTimeout do
+      ::Timeout.timeout (connection_timeout || DEFAULT_TIMEOUT), ReadTimeout do
         gets separator
       end
     end

@@ -14,7 +14,9 @@ describe Sip2::Connection do
 
     context 'location code is provided' do
       it 'sends a well formed login packet to socket' do
-        expect(socket).to receive(:send_with_timeout).with '9300CNuser_id|COpassw0rd|CPfoo|AY1AZF341'
+        expect(socket).to(
+          receive(:send_with_timeout).with('9300CNuser_id|COpassw0rd|CPfoo|AY1AZF341')
+        )
         expect(socket).to receive(:gets_with_timeout).and_return "941AY1AZFDFC\r"
 
         expect(connection.login('user_id', 'passw0rd', 'foo')).to be_truthy
@@ -46,7 +48,7 @@ describe Sip2::Connection do
     it 'sends a well formed patron information packet to socket' do
       Timecop.freeze do
         request = "63000#{timestamp}          AO|AAuser_uid|AC|ADpassw0rd|AY1AZ"
-        request = request + checksum(request)
+        request += checksum(request)
         expect(socket).to receive(:send_with_timeout).with request
 
         response = '64FOOBAR|AY1AZFBFB'
@@ -64,7 +66,7 @@ describe Sip2::Connection do
       it 'returns patron information even if the checksum is wrong' do
         Timecop.freeze do
           request = "63000#{timestamp}          AO|AAuser_uid|AC|ADpassw0rd|AY1AZ"
-          request = request + checksum(request)
+          request += checksum(request)
           expect(socket).to receive(:send_with_timeout).with request
 
           response = '64FOOBAR|AY1AZABCD'
@@ -80,7 +82,7 @@ describe Sip2::Connection do
     context 'server responds with invalid packet' do
       it 'returns nil' do
         request = "63000#{timestamp}          AO|AAuser_uid|AC|ADpassw0rd|AY1AZ"
-        request = request + checksum(request)
+        request += checksum(request)
         expect(socket).to receive(:send_with_timeout).with request
         expect(socket).to receive(:gets_with_timeout).and_return '64FOOBAR|AY1AZABCD'
 
@@ -92,7 +94,7 @@ describe Sip2::Connection do
     context 'socket closed before response received' do
       it 'returns nil' do
         request = "63000#{timestamp}          AO|AAuser_uid|AC|ADpassw0rd|AY1AZ"
-        request = request + checksum(request)
+        request += checksum(request)
         expect(socket).to receive(:send_with_timeout).with request
         expect(socket).to receive(:gets_with_timeout).and_return nil
 
@@ -105,7 +107,7 @@ describe Sip2::Connection do
       it 'sends a well formed patron information packet to socket' do
         Timecop.freeze do
           request = "63000#{timestamp}          AO|AAuser_uid|ACt3rmp4ss|ADpassw0rd|AY1AZ"
-          request = request + checksum(request)
+          request += checksum(request)
           expect(socket).to receive(:send_with_timeout).with request
 
           response = '64FOOBAR|AY1AZFBFB'
