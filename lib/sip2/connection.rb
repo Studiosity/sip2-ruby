@@ -45,8 +45,8 @@ module Sip2
     end
 
     def send_message(message)
-      @socket.send(message + "\r", 0)
-      @socket.gets "\r"
+      @socket.send_with_timeout message
+      @socket.gets_with_timeout
     end
 
     def with_error_detection(message)
