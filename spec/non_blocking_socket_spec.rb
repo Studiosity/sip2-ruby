@@ -68,7 +68,8 @@ describe Sip2::NonBlockingSocket do
     end
 
     context 'when the host isnt reachable' do
-      let(:host) { '127.0.0.0' }
+      # Host either won't exist, or for Travis is an iptables blackhole
+      let(:host) { '127.0.0.2' }
 
       it 'raises a connection timeout' do
         expect { connect_socket }.to raise_error Sip2::ConnectionTimeout
