@@ -44,4 +44,54 @@ describe Sip2::NonBlockingSocket do
       expect { socket.gets_with_timeout }.to raise_error Sip2::ReadTimeout
     end
   end
+
+  describe '.connect' do
+    subject(:connect_socket) { Sip2::NonBlockingSocket.connect(host, port) }
+    let(:host) { '127.0.0.1' }
+    let(:port) { 51_337 }
+
+    it 'initialises non-blocking socket' do
+      with_server do
+        expect(Sip2::NonBlockingSocket).to(
+          receive(:new).with(Socket::AF_INET, Socket::SOCK_STREAM, 0).and_call_original
+        )
+        connect_socket
+      end
+    end
+
+    it 'sets the connection timeout' do
+      with_server { expect(subject.connection_timeout).to eq 5 }
+    end
+
+    it 'raises connection refused (if there is no server to connect to)' do
+      expect { connect_socket }.to raise_error Errno::ECONNREFUSED
+    end
+
+    context 'when the host isnt reachable' do
+      let(:host) { '127.0.0.0' }
+
+      it 'raises a connection timeout' do
+        expect { connect_socket }.to raise_error Sip2::ConnectionTimeout
+      end
+    end
+
+    it 'can receive information from the server' do
+      with_server do |server|
+        Thread.new do
+          client = server.accept
+          client.send "hey there\r", 0
+          client.close
+        end
+
+        response = connect_socket.gets_with_timeout
+        expect(response).to eq "hey there\r"
+      end
+    end
+
+    def with_server
+      TCPServer.open(port) do |server|
+        yield server
+      end
+    end
+  end
 end

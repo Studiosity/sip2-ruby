@@ -10,6 +10,8 @@ module Sip2
     DEFAULT_TIMEOUT = 5
     SEPARATOR = "\r".freeze
 
+    attr_accessor :connection_timeout
+
     def send_with_timeout(message, separator = SEPARATOR)
       ::Timeout.timeout (connection_timeout || DEFAULT_TIMEOUT), WriteTimeout do
         send message + separator, 0
@@ -62,9 +64,5 @@ module Sip2
       end
     end
     # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
-
-    private
-
-    attr_accessor :connection_timeout
   end
 end
