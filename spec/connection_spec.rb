@@ -102,12 +102,13 @@ describe Sip2::Connection do
 
     let(:username) { 'username' }
     let(:pin) { 'pin' }
+    let(:options) { {} }
 
     let(:valid_patron_status_line) { '2300020200101    000000AO|AAusername|AC|ADpin' }
     let(:valid_patron_status_line_blank_pin) { '2300020200101    000000AO|AAusername|AC|AD' }
     let(:valid_patron_status_line_no_pin) { '2300020200101    000000AO|AAusername|AC' }
-
-    subject { connection.send(:build_patron_status_message, username, pin) }
+    let(:valid_patron_status_line_with_institution_id) { '2300020200101    000000AOCCL|AAusername|AC|ADpin' }
+    subject { connection.send(:build_patron_status_message, username, pin, options) }
 
     it 'builds the correct string' do
       expect(subject).to eq(valid_patron_status_line)
@@ -122,6 +123,53 @@ describe Sip2::Connection do
       let(:pin) { nil }
       it 'does not send the password field' do
         expect(subject).to eq(valid_patron_status_line_no_pin)
+      end
+    end
+    context 'given an institution id' do
+      let(:options) {{ institution_id: 'CCL' }}
+      it 'adds the institution ID' do
+        expect(subject).to eq(valid_patron_status_line_with_institution_id)
+      end
+    end
+  end
+
+  describe '#build_patron_information_message' do
+    around do |example|
+      Timecop.freeze('2020-01-01 00:00:00') do
+        example.run
+      end
+    end
+
+    let(:username) { 'username' }
+    let(:pin) { 'pin' }
+    let(:options) { {} }
+
+    let(:valid_patron_information_line) { '6300020200101    000000          AO|AAusername|AC|ADpin' }
+    let(:valid_patron_information_line_blank_pin) { '6300020200101    000000          AO|AAusername|AC|AD' }
+    let(:valid_patron_information_line_no_pin) { '6300020200101    000000          AO|AAusername|AC' }
+    let(:valid_patron_information_line_with_institution_id) { '6300020200101    000000          AOCCL|AAusername|AC|ADpin' }
+
+    subject { connection.send(:build_patron_information_message, username, pin, options) }
+
+    it 'builds the correct string' do
+      expect(subject).to eq(valid_patron_information_line)
+    end
+    context 'given a blank password/pin' do
+      let(:pin) { '' }
+      it 'adds the password field' do
+        expect(subject).to eq(valid_patron_information_line_blank_pin)
+      end
+    end
+    context 'given a nil password' do
+      let(:pin) { nil }
+      it 'does not send the password field' do
+        expect(subject).to eq(valid_patron_information_line_no_pin)
+      end
+    end
+    context 'given an institution id' do
+      let(:options) {{ institution_id: 'CCL' }}
+      it 'adds the institution ID' do
+        expect(subject).to eq(valid_patron_information_line_with_institution_id)
       end
     end
   end

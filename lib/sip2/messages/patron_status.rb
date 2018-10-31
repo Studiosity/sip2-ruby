@@ -24,11 +24,11 @@ module Sip2
 
       private
 
-      def build_patron_status_message(uid, password)
+      def build_patron_status_message(uid, password, options = {})
         code = '23' # Patron status
         language = '000' # Unknown
         timestamp = Time.now.strftime('%Y%m%d    %H%M%S')
-        parts = [code, language, timestamp, 'AO|AA', uid, '|AC']
+        parts = [code, language, timestamp, "AO#{options[:institution_id]}|AA", uid, '|AC']
         parts += ['|AD', password] if password.is_a?(String)
         parts.join
       end
