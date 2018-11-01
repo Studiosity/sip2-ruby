@@ -7,7 +7,7 @@ describe Sip2::Client do
     it 'yields sip connection' do
       socket = double
       expect(Sip2::NonBlockingSocket).to receive(:connect)
-        .with('127.0.0.1', 4321).and_return socket
+        .with('127.0.0.1', 4321, 5).and_return socket
       expect(socket).to receive(:close)
 
       connection = double
@@ -22,7 +22,7 @@ describe Sip2::Client do
       it 'passes the overridden port to socket initializer' do
         socket = double
         expect(Sip2::NonBlockingSocket).to receive(:connect)
-          .with('123.123.123.123', 1234).and_return socket
+          .with('123.123.123.123', 1234, 5).and_return socket
         expect(socket).to receive(:close)
 
         client.connect
@@ -41,6 +41,19 @@ describe Sip2::Client do
         expect(Sip2::Connection).to receive(:new).with(socket, true)
 
         client.connect {}
+      end
+    end
+
+    context 'overriding timeout' do
+      let(:client) { Sip2::Client.new(host: '127.0.0.1', port: 567, timeout: 1122) }
+
+      it 'passes the overridden timeout to socket initializer' do
+        socket = double
+        expect(Sip2::NonBlockingSocket).to receive(:connect)
+          .with('127.0.0.1', 567, 1122).and_return socket
+        expect(socket).to receive(:close)
+
+        client.connect
       end
     end
   end

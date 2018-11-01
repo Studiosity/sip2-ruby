@@ -41,6 +41,7 @@ module Sip2
       message = with_checksum with_error_detection message
       response = send_message message
       return if response.nil?
+
       send "handle_#{message_type}_response", response
     end
 
@@ -68,6 +69,7 @@ module Sip2
 
     def sequence_and_checksum_valid?(response)
       return true if @ignore_error_detection
+
       sequence_regex = /^(?<message>.*?AY(?<sequence>[0-9]+)AZ)(?<checksum>[A-F0-9]{4})$/
       match = response.strip.match sequence_regex
       match &&

@@ -47,6 +47,7 @@ describe Sip2::NonBlockingSocket do
 
   describe '.connect' do
     subject(:connect_socket) { Sip2::NonBlockingSocket.connect(host, port) }
+
     let(:host) { '127.0.0.1' }
     let(:port) { 51_337 }
 
@@ -56,6 +57,22 @@ describe Sip2::NonBlockingSocket do
           receive(:new).with(Socket::AF_INET, Socket::SOCK_STREAM, 0).and_call_original
         )
         connect_socket
+      end
+    end
+
+    it 'assigns the default timeout to the connection timeout' do
+      with_server do
+        expect(connect_socket.connection_timeout).to eq Sip2::NonBlockingSocket::DEFAULT_TIMEOUT
+      end
+    end
+
+    context 'when the socket timeout is specified' do
+      subject(:connect_socket) { Sip2::NonBlockingSocket.connect(host, port, 4321) }
+
+      it 'assigns override to the connection timeout' do
+        with_server do
+          expect(connect_socket.connection_timeout).to eq 4321
+        end
       end
     end
 

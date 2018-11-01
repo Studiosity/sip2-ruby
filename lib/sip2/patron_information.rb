@@ -72,6 +72,7 @@ module Sip2
     def transaction_date
       match = raw_response.match(/\A64.{17}(\d{4})(\d{2})(\d{2})(.{4})(\d{2})(\d{2})(\d{2})/)
       return unless match
+
       _, year, month, day, zone, hour, minute, second = match.to_a
       Time.new(
         year.to_i, month.to_i, day.to_i,
