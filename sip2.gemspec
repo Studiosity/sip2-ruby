@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ['abrom']
   spec.email         = ['a.bromwich@gmail.com']
 
-  spec.summary       = '3M™ Standard Interchange Protocol v2 client implementation in Ruby'
+  spec.summary       = 'SIP2 Ruby client'
   spec.description   = '3M™ Standard Interchange Protocol v2 client implementation in Ruby'
   spec.homepage      = 'https://github.com/Studiosity/sip2-ruby'
   spec.license       = 'MIT'
@@ -19,9 +19,9 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = '>= 2.2.0'
 
-  spec.add_development_dependency 'bundler', '>= 1.11'
-  spec.add_development_dependency 'rake', '>= 10.0'
+  spec.add_development_dependency 'bundler', '~> 1.11'
+  spec.add_development_dependency 'rake', '~> 12.0'
   spec.add_development_dependency 'rspec', '~> 3.0'
-  spec.add_development_dependency 'rubocop', '~> 0'
-  spec.add_development_dependency 'timecop', '~> 0'
+  spec.add_development_dependency 'rubocop', '~> 0.60'
+  spec.add_development_dependency 'timecop', '~> 0.9'
 end
