@@ -60,12 +60,16 @@ module Sip2
         boolean 'CQ'
       end
 
+      def screen_message
+        text 'AF'
+      end
+
       private
 
       def attributes_for_inspect
         %i[fee_amount personal_name valid_patron? valid_patron_password? 
            excessive_fines_or_fees? charge_privileges_denied? 
-           renewal_privileges_denied?]
+           renewal_privileges_denied? screen_message]
       end
     end
   end

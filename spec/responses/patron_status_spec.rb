@@ -4,11 +4,12 @@ describe Sip2::Responses::PatronStatus do
   let(:patron_status) { Sip2::Responses::PatronStatus.new response }
 
   # rubocop:disable LineLength
-  let(:raw_response_card_valid)                 { '24              00020101014    120240|BHGBP|BLY|CQY|AAJSMITH|AESmith, John|BV15.00|AY0AZE4FD' }
-  let(:raw_response_card_expired)               { '24Y             00020101014    120240|BHGBP|BLY|CQY|AAJSMITH|AESmith, John|BV15.00|AY0AZE4FD' }
-  let(:raw_response_card_renewal_denied)        { '24 Y            00020101014    120240|BHGBP|BLY|CQY|AAJSMITH|AESmith, John|BV15.00|AY0AZE4FD' }
-  let(:raw_response_outstanding_fines)          { '24          Y   00020101014    120240|BHGBP|BLY|CQY|AAJSMITH|AESmith, John|BV15.00|AY0AZE4FD' }
-  let(:raw_response_outstanding_fees)           { '24           Y  00020101014    120240|BHGBP|BLY|CQY|AAJSMITH|AESmith, John|BV15.00|AY0AZE4FD' }
+  let(:raw_response_card_valid)                   { '24              00020101014    120240|BHGBP|BLY|CQY|AAJSMITH|AESmith, John|BV15.00|AY0AZE4FD' }
+  let(:raw_response_card_expired)                 { '24Y             00020101014    120240|BHGBP|BLY|CQY|AAJSMITH|AESmith, John|BV15.00|AY0AZE4FD' }
+  let(:raw_response_with_invalid_institution_id)  { '24              00120181112    101023AO|AAP 33998|AE|BLN|CQN|AFThe institution id is invalid.|AY2AZE53D' }
+  let(:raw_response_card_renewal_denied)          { '24 Y            00020101014    120240|BHGBP|BLY|CQY|AAJSMITH|AESmith, John|BV15.00|AY0AZE4FD' }
+  let(:raw_response_outstanding_fines)            { '24          Y   00020101014    120240|BHGBP|BLY|CQY|AAJSMITH|AESmith, John|BV15.00|AY0AZE4FD' }
+  let(:raw_response_outstanding_fees)             { '24           Y  00020101014    120240|BHGBP|BLY|CQY|AAJSMITH|AESmith, John|BV15.00|AY0AZE4FD' }
   let(:invalid_response) { '' }
   # rubocop:enable LineLength
 
@@ -106,6 +107,19 @@ describe Sip2::Responses::PatronStatus do
     context 'when the password is invalid' do
       let(:response) { 'FOO|CQN|BAR' }
       it { is_expected.to be false }
+    end
+  end
+
+  describe 'screen message' do
+    subject { patron_status.screen_message }
+
+    context 'when none is present' do
+      let(:response) { raw_response_card_expired }
+      it { is_expected.to be nil }
+    end
+    context 'when a message is present' do
+      let(:response) { raw_response_with_invalid_institution_id }
+      it { is_expected.to eq('The institution id is invalid.') }
     end
   end
 end

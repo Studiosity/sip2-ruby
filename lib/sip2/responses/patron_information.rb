@@ -22,10 +22,14 @@ module Sip2
         text 'AQ'
       end
 
+      def screen_message
+        text 'AF'
+      end
+
       private
 
       def attributes_for_inspect
-        %i[patron_valid? authenticated? email location]
+        %i[patron_valid? authenticated? email location screen_message]
       end
     end
   end
