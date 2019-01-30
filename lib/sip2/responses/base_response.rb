@@ -50,8 +50,14 @@ module Sip2
         end
       end
 
+      # Parse a boolean response.  If message is not found, return nil
+      # so we can tell it apart from a "N" (false) answer
+      #
       def parse_boolean(response, message_id)
-        response[/\|#{message_id}([YN])\|/, 1] == 'Y'
+        msg = response[/\|#{message_id}([YN])\|/, 1]
+        return true if msg == 'Y'
+        return false if msg == 'N'
+        nil
       end
 
       def parse_text(response, message_id)
