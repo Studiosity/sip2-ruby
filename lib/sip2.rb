@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'sip2/version'
 
 require 'sip2/patron_information'

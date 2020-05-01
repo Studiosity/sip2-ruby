@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Sip2
   #
   # Sip2 Client
@@ -14,7 +16,7 @@ module Sip2
       socket = NonBlockingSocket.connect @host, @port, @timeout
       yield Connection.new(socket, @ignore_error_detection) if block_given?
     ensure
-      socket.close if socket
+      socket&.close
     end
   end
 end

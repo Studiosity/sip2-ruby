@@ -1,0 +1,11 @@
+{
+  "server": {
+    "host": "127.0.0.1",
+    "port": 6000,
+    "errorDetectionEnabled": true
+  },
+  "login": {
+    "user": "test-user",
+    "password": "test-password"
+  }
+}
