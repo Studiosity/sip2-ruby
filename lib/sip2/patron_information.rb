@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Sip2
   #
   # Sip2 Patron Information

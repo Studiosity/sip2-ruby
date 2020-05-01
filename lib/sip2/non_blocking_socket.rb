@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'socket'
 require 'timeout'
 
@@ -8,7 +10,7 @@ module Sip2
   #
   class NonBlockingSocket < Socket
     DEFAULT_TIMEOUT = 5
-    SEPARATOR = "\r".freeze
+    SEPARATOR = "\r"
 
     attr_accessor :connection_timeout
 
@@ -47,7 +49,7 @@ module Sip2
             begin
               # Verify there is now a good connection
               socket.connect_nonblock(sockaddr)
-            rescue Errno::EISCONN # rubocop:disable Lint/HandleExceptions
+            rescue Errno::EISCONN
               # Good news everybody, the socket is connected!
             rescue StandardError
               # An unexpected exception was raised - the connection is no good.

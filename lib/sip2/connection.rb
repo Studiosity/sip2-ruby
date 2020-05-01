@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Sip2
   #
   # Sip2 Connection
@@ -64,7 +66,7 @@ module Sip2
       message.each_char { |m| check += m.ord }
       check += "\0".ord
       check = (check ^ 0xFFFF) + 1
-      format '%4.4X', check
+      format '%<check>4.4X', check: check
     end
 
     def sequence_and_checksum_valid?(response)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Sip2::Connection do
@@ -126,7 +128,7 @@ describe Sip2::Connection do
     message.each_char { |m| check += m.ord }
     check += "\0".ord
     check = (check ^ 0xFFFF) + 1
-    format '%4.4X', check
+    format '%<check>4.4X', check: check
   end
 
   def timestamp
