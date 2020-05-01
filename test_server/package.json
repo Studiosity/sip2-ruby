@@ -1,0 +1,14 @@
+{
+  "name": "test_server",
+  "version": "1.0.0",
+  "description": "Test SIP2 server",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Andrew Bromwich (a.bromwich@gmail.com)",
+  "license": "MIT",
+  "dependencies": {
+    "config": "^3.3.1"
+  }
+}
