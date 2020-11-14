@@ -10,24 +10,11 @@ module Sip2
   #
   class NonBlockingSocket < Socket
     DEFAULT_TIMEOUT = 5
-    SEPARATOR = "\r"
 
     attr_accessor :connection_timeout
 
-    def send_with_timeout(message, separator = SEPARATOR)
-      ::Timeout.timeout (connection_timeout || DEFAULT_TIMEOUT), WriteTimeout do
-        send message + separator, 0
-      end
-    end
-
-    def gets_with_timeout(separator = SEPARATOR)
-      ::Timeout.timeout (connection_timeout || DEFAULT_TIMEOUT), ReadTimeout do
-        gets separator
-      end
-    end
-
     # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
-    def self.connect(host, port, timeout = DEFAULT_TIMEOUT)
+    def self.connect(host, port, timeout: DEFAULT_TIMEOUT)
       # Convert the passed host into structures the non-blocking calls can deal with
       addr = Socket.getaddrinfo(host, nil)
       sockaddr = Socket.pack_sockaddr_in(port, addr[0][3])

@@ -5,6 +5,8 @@ module Sip2
   # Sip2 Connection
   #
   class Connection
+    LINE_SEPARATOR = "\r"
+
     @connection_modules = []
 
     class << self
@@ -22,6 +24,11 @@ module Sip2
       @socket = socket
       @ignore_error_detection = ignore_error_detection
       @sequence = 1
+    end
+
+    def send_message(message)
+      puts_with_timeout message
+      gets_with_timeout
     end
 
     def method_missing(method_name, *args)
@@ -47,9 +54,23 @@ module Sip2
       send "handle_#{message_type}_response", response
     end
 
-    def send_message(message)
-      @socket.send_with_timeout message
-      @socket.gets_with_timeout
+    def puts_with_timeout(message, separator: LINE_SEPARATOR)
+      ::Timeout.timeout connection_timeout, WriteTimeout do
+        @socket.write message + separator
+      end
+    end
+
+    def gets_with_timeout(separator: LINE_SEPARATOR)
+      ::Timeout.timeout connection_timeout, ReadTimeout do
+        @socket.gets(separator)&.chomp(separator)
+      end
+    end
+
+    def connection_timeout
+      # We want the underlying connection where the timeout is configured,
+      # so if we're dealing with an SSLSocket then we need to unwrap it
+      io = @socket.respond_to?(:io) ? @socket.io : @socket
+      io.connection_timeout || NonBlockingSocket::DEFAULT_TIMEOUT
     end
 
     def with_error_detection(message)
@@ -72,7 +93,7 @@ module Sip2
     def sequence_and_checksum_valid?(response)
       return true if @ignore_error_detection
 
-      sequence_regex = /^(?<message>.*?AY(?<sequence>[0-9]+)AZ)(?<checksum>[A-F0-9]{4})$/
+      sequence_regex = /\A(?<message>.*?AY(?<sequence>[0-9]+)AZ)(?<checksum>[A-F0-9]{4})\z/
       match = response.strip.match sequence_regex
       match &&
         match[:sequence] == @sequence.to_s &&
