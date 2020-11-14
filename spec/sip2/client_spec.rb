@@ -133,7 +133,9 @@ describe Sip2::Client do
               )
             end
 
-            expect { client.connect }.to raise_error(OpenSSL::SSL::SSLError, /certificate verify failed/)
+            expect { client.connect }.to(
+              raise_error(OpenSSL::SSL::SSLError, /certificate verify failed/)
+            )
           end
         end
 

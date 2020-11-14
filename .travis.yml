@@ -15,7 +15,7 @@ install:
   - gem install rubocop
 
 script:
-  - rubocop
+  - bundle exec rubocop
   # Blackhole 127.0.0.2 for testing connection timeouts
   - sudo iptables -I INPUT -s 127.0.0.2 -j DROP
   - bundle exec rake
