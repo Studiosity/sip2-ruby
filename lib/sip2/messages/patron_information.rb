@@ -12,7 +12,7 @@ module Sip2
 
       private
 
-      def build_patron_information_message(uid, password, terminal_password: nil)
+      def build_patron_information_message(uid:, password:, terminal_password: nil)
         code = '63' # Patron information
         language = '000' # Unknown
         timestamp = Time.now.strftime('%Y%m%d    %H%M%S')

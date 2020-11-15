@@ -14,7 +14,7 @@ module Sip2
     attr_accessor :connection_timeout
 
     # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
-    def self.connect(host, port, timeout: DEFAULT_TIMEOUT)
+    def self.connect(host:, port:, timeout: DEFAULT_TIMEOUT)
       # Convert the passed host into structures the non-blocking calls can deal with
       addr = Socket.getaddrinfo(host, nil)
       sockaddr = Socket.pack_sockaddr_in(port, addr[0][3])

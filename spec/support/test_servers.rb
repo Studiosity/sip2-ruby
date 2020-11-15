@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
 module TestServers
-  def with_server(port:)
-    TCPServer.open(port) do |server|
-      yield server
-    end
+  def with_server(port:, &block)
+    TCPServer.open(port, &block)
   end
 
   def with_ssl_server(port:)

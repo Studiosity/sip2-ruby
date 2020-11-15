@@ -20,7 +20,7 @@ module Sip2
     include Messages::Login
     include Messages::PatronInformation
 
-    def initialize(socket, ignore_error_detection)
+    def initialize(socket:, ignore_error_detection: false)
       @socket = socket
       @ignore_error_detection = ignore_error_detection
       @sequence = 1
@@ -74,7 +74,7 @@ module Sip2
     end
 
     def with_error_detection(message)
-      message + '|AY' + @sequence.to_s
+      "#{message}|AY#{@sequence}"
     end
 
     def with_checksum(message)

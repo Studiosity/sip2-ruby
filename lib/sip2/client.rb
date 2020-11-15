@@ -13,19 +13,23 @@ module Sip2
       @ssl_context = ssl_context
     end
 
+    # rubocop:disable Metrics/MethodLength
     def connect
-      socket = NonBlockingSocket.connect @host, @port, timeout: @timeout
+      socket = NonBlockingSocket.connect host: @host, port: @port, timeout: @timeout
 
       # If we've been provided with an SSL context then use it to wrap out existing connection
       if @ssl_context
-        socket = ::OpenSSL::SSL::SSLSocket.new(socket, @ssl_context)
+        socket = ::OpenSSL::SSL::SSLSocket.new socket, @ssl_context
         socket.sync_close = true
         socket.connect
       end
 
-      yield Connection.new(socket, @ignore_error_detection) if block_given?
+      if block_given?
+        yield Connection.new(socket: socket, ignore_error_detection: @ignore_error_detection)
+      end
     ensure
       socket&.close
     end
+    # rubocop:enable Metrics/MethodLength
   end
 end

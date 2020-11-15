@@ -7,20 +7,20 @@ describe Sip2::Client do
     let(:client) { Sip2::Client.new(host: '127.0.0.1', port: 4321) }
 
     it 'yields sip connection' do
-      socket = double
+      socket = instance_double 'Sip2::NonBlockingSocket'
       expect(Sip2::NonBlockingSocket).to(
         receive(:connect).
-          with('127.0.0.1', 4321, timeout: 5).
+          with(host: '127.0.0.1', port: 4321, timeout: 5).
           and_return(socket)
       )
       expect(socket).to receive(:close)
 
       expect(OpenSSL::SSL::SSLSocket).not_to receive(:new)
 
-      connection = double
+      connection = instance_double 'Sip2::Connection'
       expect(Sip2::Connection).to(
         receive(:new).
-          with(socket, false).
+          with(socket: socket, ignore_error_detection: false).
           and_return(connection)
       )
       expect { |block| client.connect(&block) }.to yield_with_args connection
@@ -30,10 +30,10 @@ describe Sip2::Client do
       let(:client) { Sip2::Client.new(host: '123.123.123.123', port: 1234) }
 
       it 'passes the overridden port to socket initializer' do
-        socket = double
+        socket = instance_double 'Sip2::NonBlockingSocket'
         expect(Sip2::NonBlockingSocket).to(
           receive(:connect).
-            with('123.123.123.123', 1234, timeout: 5).
+            with(host: '123.123.123.123', port: 1234, timeout: 5).
             and_return(socket)
         )
         expect(socket).to receive(:close)
@@ -46,12 +46,15 @@ describe Sip2::Client do
       let(:client) { Sip2::Client.new(host: '', port: 1, ignore_error_detection: true) }
 
       it 'passes error detection flag to connection' do
-        socket = double
+        socket = instance_double 'Sip2::NonBlockingSocket'
         expect(Sip2::NonBlockingSocket).to receive(:connect).and_return socket
         expect(socket).to receive(:close)
 
         # Test is the second parameter of the Connection initializer
-        expect(Sip2::Connection).to receive(:new).with(socket, true)
+        expect(Sip2::Connection).to(
+          receive(:new).
+            with(socket: socket, ignore_error_detection: true)
+        )
 
         client.connect {}
       end
@@ -61,10 +64,10 @@ describe Sip2::Client do
       let(:client) { Sip2::Client.new(host: '127.0.0.1', port: 567, timeout: 1122) }
 
       it 'passes the overridden timeout to socket initializer' do
-        socket = double
+        socket = instance_double 'Sip2::NonBlockingSocket'
         expect(Sip2::NonBlockingSocket).to(
           receive(:connect).
-            with('127.0.0.1', 567, timeout: 1122).
+            with(host: '127.0.0.1', port: 567, timeout: 1122).
             and_return(socket)
         )
         expect(socket).to receive(:close)
@@ -82,7 +85,7 @@ describe Sip2::Client do
         socket = instance_double 'Sip2::NonBlockingSocket'
         expect(Sip2::NonBlockingSocket).to(
           receive(:connect).
-            with('127.0.0.1', 4321, timeout: 5).
+            with(host: '127.0.0.1', port: 4321, timeout: 5).
             and_return(socket)
         )
 
@@ -100,7 +103,7 @@ describe Sip2::Client do
         connection = instance_double 'Sip2::Connection'
         expect(Sip2::Connection).to(
           receive(:new).
-            with(ssl_socket, false).
+            with(socket: ssl_socket, ignore_error_detection: false).
             and_return(connection)
         )
         expect { |block| client.connect(&block) }.to yield_with_args connection

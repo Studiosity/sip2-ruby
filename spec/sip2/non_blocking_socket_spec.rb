@@ -8,7 +8,7 @@ describe Sip2::NonBlockingSocket do
   it { is_expected.to be_a Socket }
 
   describe '.connect' do
-    subject(:connect_socket) { Sip2::NonBlockingSocket.connect(host, port) }
+    subject(:connect_socket) { Sip2::NonBlockingSocket.connect(host: host, port: port) }
 
     let(:host) { '127.0.0.1' }
     let(:port) { 51_337 }
@@ -29,7 +29,9 @@ describe Sip2::NonBlockingSocket do
     end
 
     context 'when the socket timeout is specified' do
-      subject(:connect_socket) { Sip2::NonBlockingSocket.connect(host, port, timeout: 4321) }
+      subject(:connect_socket) do
+        Sip2::NonBlockingSocket.connect(host: host, port: port, timeout: 4321)
+      end
 
       it 'assigns override to the connection timeout' do
         with_server(port: port) do

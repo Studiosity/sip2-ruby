@@ -9,7 +9,7 @@ describe Sip2::Connection do
       write: nil, gets: "default-result\r", connection_timeout: nil
     )
   end
-  let(:connection) { Sip2::Connection.new(socket, false) }
+  let(:connection) { Sip2::Connection.new(socket: socket, ignore_error_detection: false) }
 
   describe '#send_message' do
     subject(:send_message) { connection.send_message 'a message' }
@@ -67,7 +67,7 @@ describe Sip2::Connection do
           and_return('941AY1AZFDFC')
       )
 
-      expect(connection.login('user_id', 'passw0rd')).to be_truthy
+      expect(connection.login(username: 'user_id', password: 'passw0rd')).to be_truthy
     end
 
     context 'location code is provided' do
@@ -78,12 +78,14 @@ describe Sip2::Connection do
             and_return('941AY1AZFDFC')
         )
 
-        expect(connection.login('user_id', 'passw0rd', location_code: 'foo')).to be_truthy
+        expect(
+          connection.login(username: 'user_id', password: 'passw0rd', location_code: 'foo')
+        ).to be_truthy
       end
     end
 
     context 'error detection is disabled' do
-      let(:connection) { Sip2::Connection.new(socket, true) }
+      let(:connection) { Sip2::Connection.new(socket: socket, ignore_error_detection: true) }
 
       it 'returns true even if the checksum is wrong' do
         expect(connection).to(
@@ -92,7 +94,7 @@ describe Sip2::Connection do
             and_return('941AY6AZABCD')
         )
 
-        expect(connection.login('user_id', 'passw0rd')).to be_truthy
+        expect(connection.login(username: 'user_id', password: 'passw0rd')).to be_truthy
       end
     end
 
@@ -104,7 +106,7 @@ describe Sip2::Connection do
             and_return('940AY1AZFDFD')
         )
 
-        expect(connection.login('user_id', 'passw0rd1')).to be_falsey
+        expect(connection.login(username: 'user_id', password: 'passw0rd1')).to be_falsey
       end
     end
   end
@@ -118,14 +120,14 @@ describe Sip2::Connection do
 
         expect(connection).to receive(:send_message).with(request).and_return response
 
-        info = connection.patron_information('user_uid', 'passw0rd')
+        info = connection.patron_information(uid: 'user_uid', password: 'passw0rd')
         expect(info).to be_a Sip2::PatronInformation
         expect(info.raw_response).to eq response
       end
     end
 
     context 'error detection is disabled' do
-      let(:connection) { Sip2::Connection.new(socket, true) }
+      let(:connection) { Sip2::Connection.new(socket: socket, ignore_error_detection: true) }
 
       it 'returns patron information even if the checksum is wrong' do
         Timecop.freeze do
@@ -135,7 +137,7 @@ describe Sip2::Connection do
 
           expect(connection).to receive(:send_message).with(request).and_return response
 
-          info = connection.patron_information('user_uid', 'passw0rd')
+          info = connection.patron_information(uid: 'user_uid', password: 'passw0rd')
           expect(info).to be_a Sip2::PatronInformation
           expect(info.raw_response).to eq response
         end
@@ -148,7 +150,7 @@ describe Sip2::Connection do
         request += checksum(request)
         expect(connection).to receive(:send_message).with(request).and_return '64FOOBAR|AY1AZABCD'
 
-        info = connection.patron_information('user_uid', 'passw0rd')
+        info = connection.patron_information(uid: 'user_uid', password: 'passw0rd')
         expect(info).to be_nil
       end
     end
@@ -160,7 +162,7 @@ describe Sip2::Connection do
 
         expect(connection).to receive(:send_message).with(request).and_return nil
 
-        info = connection.patron_information('user_uid', 'passw0rd')
+        info = connection.patron_information(uid: 'user_uid', password: 'passw0rd')
         expect(info).to be_nil
       end
     end
@@ -175,7 +177,9 @@ describe Sip2::Connection do
           expect(connection).to receive(:send_message).with(request).and_return response
 
           info =
-            connection.patron_information('user_uid', 'passw0rd', terminal_password: 't3rmp4ss')
+            connection.patron_information(
+              uid: 'user_uid', password: 'passw0rd', terminal_password: 't3rmp4ss'
+            )
           expect(info).to be_a Sip2::PatronInformation
           expect(info.raw_response).to eq response
         end
