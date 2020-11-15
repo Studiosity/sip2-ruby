@@ -27,8 +27,8 @@ module Sip2
     end
 
     def send_message(message)
-      puts_with_timeout message
-      gets_with_timeout
+      write_with_timeout message
+      read_with_timeout
     end
 
     def method_missing(method_name, *args)
@@ -54,13 +54,13 @@ module Sip2
       send "handle_#{message_type}_response", response
     end
 
-    def puts_with_timeout(message, separator: LINE_SEPARATOR)
+    def write_with_timeout(message, separator: LINE_SEPARATOR)
       ::Timeout.timeout connection_timeout, WriteTimeout do
         @socket.write message + separator
       end
     end
 
-    def gets_with_timeout(separator: LINE_SEPARATOR)
+    def read_with_timeout(separator: LINE_SEPARATOR)
       ::Timeout.timeout connection_timeout, ReadTimeout do
         @socket.gets(separator)&.chomp(separator)
       end
