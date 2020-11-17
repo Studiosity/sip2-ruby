@@ -42,6 +42,45 @@ patron =
 puts 'Valid patron' if patron && patron.authenticated?
 ```
 
+### Using TLS
+
+The Sip2::Client will use TLS if a
+[SSLContext](https://ruby-doc.org/stdlib-2.4.10/libdoc/openssl/rdoc/OpenSSL/SSL/SSLContext.html)
+is passed in the `ssl_context` parameter. There are quite a few ways this can be configured, but that will
+depend on how the server being connected to is configured. A basic example is:
+
+```ruby
+# Setup a cert store using the system certificates/trust chain
+cert_store = OpenSSL::X509::Store.new
+cert_store.set_default_paths
+
+# Setup the SSL context
+ssl_context = OpenSSL::SSL::SSLContext.new
+ssl_context.verify_mode = OpenSSL::SSL::VERIFY_PEER # This is important. We want to verify the certificate is legitimate 
+ssl_context.min_version = OpenSSL::SSL::TLS1_2_VERSION # Generally good practice to enforce the most recent TLS version
+ssl_context.cert_store = cert_store # Use the certificate store we configured above
+
+# Raise an exception if the certificate doesn't check out
+ssl_context.verify_callback = proc do |preverify_ok, context|
+  raise OpenSSL::SSL::SSLError, <<~ERROR.strip if preverify_ok != true || context.error != 0
+    SSL Verification failed -- Preverify: #{preverify_ok}, Error: #{context.error_string} (#{context.error})
+  ERROR
+
+  true
+end
+
+client = Sip2::Client.new(host: 'my.sip2.host.net', port: 6001, ssl_context: ssl_context)
+```
+
+If you needed to explicitly specify the certificate to be used there are a few options available
+to use instead of cert_store (see the documentation for full details and other options):
+ * ca_file          - path to a file containing a CA certificate
+ * ca_path          - path to a directory containing CA certificates
+ * client_ca        - a certificate or array of certificates
+ * client_cert_cb   - callback where an array containing an X509 certificate and key are returned
+
+Be sure to validate that your setup behaves the way you expect it to.
+Pass in an invalid certificate and see it fails. Pass a mismatching hostname and see it fails. etc.
 
 ## Contributing
 
