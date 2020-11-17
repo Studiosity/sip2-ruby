@@ -77,15 +77,16 @@ describe Sip2::Client do
     end
 
     context 'when specifying an SSL context' do
-      let(:client) { Sip2::Client.new(host: '127.0.0.1', port: port, ssl_context: ssl_context) }
+      let(:client) { Sip2::Client.new(host: host, port: port, ssl_context: ssl_context) }
       let(:ssl_context) { OpenSSL::SSL::SSLContext.new }
+      let(:host) { 'sip2test.ddns.net' }
       let(:port) { 4321 }
 
       it 'yields sip connection' do
         socket = instance_double 'Sip2::NonBlockingSocket'
         expect(Sip2::NonBlockingSocket).to(
           receive(:connect).
-            with(host: '127.0.0.1', port: 4321, timeout: 5).
+            with(host: 'sip2test.ddns.net', port: 4321, timeout: 5).
             and_return(socket)
         )
 
@@ -95,8 +96,10 @@ describe Sip2::Client do
             with(socket, ssl_context).
             and_return(ssl_socket)
         )
-        expect(ssl_socket).to receive(:sync_close=).with(true)
+        expect(ssl_socket).to receive(:hostname=).with 'sip2test.ddns.net'
+        expect(ssl_socket).to receive(:sync_close=).with true
         expect(ssl_socket).to receive(:connect)
+        expect(ssl_socket).to receive(:post_connection_check).with 'sip2test.ddns.net'
 
         expect(ssl_socket).to receive(:close)
 
@@ -119,6 +122,44 @@ describe Sip2::Client do
 
           response = client.connect { |connection| connection.send_message 'hi' }
           expect(response).to eq 'hey there'
+        end
+      end
+
+      context 'when the host doesnt match the certificate' do
+        let(:host) { 'sip2error.ddns.net' }
+
+        it 'can connect to an SSL server' do
+          with_ssl_server(port: port) do |server|
+            Thread.new do
+              server.accept
+            end
+
+            expect { client.connect }.to(
+              raise_error(
+                OpenSSL::SSL::SSLError,
+                'hostname "sip2error.ddns.net" does not match the server certificate'
+              )
+            )
+          end
+        end
+      end
+
+      context 'when the host is an IP address' do
+        let(:host) { '127.0.0.1' }
+
+        it 'can connect to an SSL server' do
+          with_ssl_server(port: port) do |server|
+            Thread.new do
+              server.accept
+            end
+
+            expect { client.connect }.to(
+              raise_error(
+                OpenSSL::SSL::SSLError,
+                'hostname "127.0.0.1" does not match the server certificate'
+              )
+            )
+          end
         end
       end
 

@@ -20,8 +20,10 @@ module Sip2
       # If we've been provided with an SSL context then use it to wrap out existing connection
       if @ssl_context
         socket = ::OpenSSL::SSL::SSLSocket.new socket, @ssl_context
+        socket.hostname = @host # Needed for SNI
         socket.sync_close = true
         socket.connect
+        socket.post_connection_check @host # Validate the peer certificate matches the host
       end
 
       if block_given?
