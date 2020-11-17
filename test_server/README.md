@@ -19,3 +19,19 @@ npm install
 ```bash
 node index.js
 ```
+
+This will start a demonstration SIP2 server on port 6000
+
+## Supported messages
+
+Current messages supported by the test server are:
+
+* 93 - Login
+
+## Running the stunnel server to test SSL connections
+```bash
+stunnel stunnel/stunnel.conf
+```
+
+The configuration is set to accept SSL connections on port 6001 and will proxy those
+requests through to the node server running on port 6000

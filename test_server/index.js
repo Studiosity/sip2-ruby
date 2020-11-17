@@ -63,9 +63,8 @@ const server = net.createServer((socket)=> {
 
     switch (line.substring(0, 2)) {
       case "93": // Login
-        const loginRegex = /^93([0-9])([0-9])CN([^|]*)\|CO([^|]*)\|CP([^|]*)\|/
-        let uidAlgorithm, pwdAlgorithm, loginUser, loginPassword, locationCode;
-        [match, uidAlgorithm, pwdAlgorithm, loginUser, loginPassword, locationCode] = line.match(loginRegex);
+        const loginRegex = /^93([0-9])([0-9])CN([^|]*)\|CO([^|]*)\|(?:CP([^|]*)\|)?/;
+        let [match, uidAlgorithm, pwdAlgorithm, loginUser, loginPassword, locationCode] = line.match(loginRegex) || [];
 
         authenticated = config.login.user === loginUser && config.login.password === loginPassword;
 

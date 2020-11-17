@@ -12,11 +12,11 @@ module Sip2
 
       private
 
-      def build_login_message(username, password, location_code = nil)
+      def build_login_message(username:, password:, location_code: nil)
         code = '93' # Login
         uid_algorithm = pw_algorithm = '0' # Plain text
-        username_field = 'CN' + username
-        password_field = 'CO' + password
+        username_field = "CN#{username}"
+        password_field = "CO#{password}"
         location_code = location_code.strip if location_code.is_a? String
         location_field = location_code ? "|CP#{location_code}" : ''
 
@@ -26,7 +26,7 @@ module Sip2
       end
 
       def handle_login_response(response)
-        sequence_and_checksum_valid?(response) && response[/^94([01])AY/, 1] == '1'
+        sequence_and_checksum_valid?(response) && response[/\A94([01])AY/, 1] == '1'
       end
     end
   end

@@ -2,6 +2,8 @@
 
 require 'sip2/version'
 
+require 'openssl'
+
 require 'sip2/patron_information'
 
 require 'sip2/messages/login'
