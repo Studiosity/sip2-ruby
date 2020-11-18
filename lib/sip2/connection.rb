@@ -7,19 +7,6 @@ module Sip2
   class Connection
     LINE_SEPARATOR = "\r"
 
-    @connection_modules = []
-
-    class << self
-      attr_reader :connection_modules
-
-      def add_connection_module(module_name)
-        @connection_modules << module_name
-      end
-    end
-
-    include Messages::Login
-    include Messages::PatronInformation
-
     def initialize(socket:, ignore_error_detection: false)
       @socket = socket
       @ignore_error_detection = ignore_error_detection
@@ -27,32 +14,28 @@ module Sip2
     end
 
     def send_message(message)
+      message = with_checksum with_error_detection message
       write_with_timeout message
-      read_with_timeout
+      response = read_with_timeout
+      response if sequence_and_checksum_valid? response
+    ensure
+      @sequence += 1
     end
 
     def method_missing(method_name, *args)
-      if Connection.connection_modules.include?(method_name.to_sym)
-        send_and_handle_message(method_name, *args)
-      else
+      message_class = Messages::Base.message_class_for_method(method_name)
+      if message_class.nil?
         super
+      else
+        message_class.new(self).action_message(*args)
       end
     end
 
     def respond_to_missing?(method_name, _include_private = false)
-      Connection.connection_modules.include?(method_name.to_sym) || super
+      !Messages::Base.message_class_for_method(method_name).nil? || super
     end
 
     private
-
-    def send_and_handle_message(message_type, *args)
-      message = send "build_#{message_type}_message", *args
-      message = with_checksum with_error_detection message
-      response = send_message message
-      return if response.nil?
-
-      send "handle_#{message_type}_response", response
-    end
 
     def write_with_timeout(message, separator: LINE_SEPARATOR)
       ::Timeout.timeout connection_timeout, WriteTimeout do
@@ -92,14 +75,13 @@ module Sip2
 
     def sequence_and_checksum_valid?(response)
       return true if @ignore_error_detection
+      return false unless response.is_a? String
 
       sequence_regex = /\A(?<message>.*?AY(?<sequence>[0-9]+)AZ)(?<checksum>[A-F0-9]{4})\z/
       match = response.strip.match sequence_regex
       match &&
         match[:sequence] == @sequence.to_s &&
         match[:checksum] == checksum_for(match[:message])
-    ensure
-      @sequence += 1
     end
   end
 end

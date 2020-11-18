@@ -14,12 +14,52 @@ describe Sip2::Connection do
   describe '#send_message' do
     subject(:send_message) { connection.send_message 'a message' }
 
-    describe 'write timeouts' do
-      it 'calls to underlying socket `write` method with message and trailing carriage return' do
-        expect(socket).to receive(:write).with("a message\r")
-        send_message
+    it 'calls to underlying socket `write` method with message, error detection, checksum' do
+      expect(socket).to receive(:write).with("a message|AY1AZFAB8\r")
+      send_message
+    end
+
+    it 'calls to underlying socket `gets` method and returns result' do
+      expect(socket).to receive(:gets).with("\r").and_return "messageAY1AZFBB5\r"
+      expect(send_message).to eq 'messageAY1AZFBB5'
+    end
+
+    context 'when the returned message doesnt pass the checksum test' do
+      it 'returns nil' do
+        expect(socket).to receive(:gets).with("\r").and_return "messageAY11234\r"
+        expect(send_message).to be_nil
+      end
+    end
+
+    context 'when the socket is closed before response received (returns nil)' do
+      it 'returns nil' do
+        expect(socket).to receive(:gets).with("\r").and_return nil
+        expect(send_message).to be_nil
+      end
+    end
+
+    context 'when the returned message has a sequence mismatch' do
+      it 'returns nil' do
+        expect(socket).to receive(:gets).with("\r").and_return "messageAY2AZFBB\r"
+        expect(send_message).to be_nil
+      end
+    end
+
+    context 'error detection is disabled' do
+      let(:connection) { Sip2::Connection.new(socket: socket, ignore_error_detection: true) }
+
+      it 'returns the message even if the sequence is wrong' do
+        expect(socket).to receive(:gets).with("\r").and_return "messageAY2AZFBB\r"
+        expect(send_message).to eq 'messageAY2AZFBB'
       end
 
+      it 'returns the message even if the checksum is wrong' do
+        expect(socket).to receive(:gets).with("\r").and_return "messageAY11234\r"
+        expect(send_message).to eq 'messageAY11234'
+      end
+    end
+
+    describe 'write timeouts' do
       it 'doesnt timeout if write succeeds in less than 5 seconds' do
         expect(socket).to receive(:write) do
           sleep 4.8
@@ -36,11 +76,6 @@ describe Sip2::Connection do
     end
 
     describe 'read timeouts' do
-      it 'calls to underlying socket `gets` method and returns result' do
-        expect(socket).to receive(:gets).with("\r").and_return "bar\r"
-        expect(send_message).to eq 'bar'
-      end
-
       it 'doesnt timeout if gets succeeds in less than 5 seconds' do
         expect(socket).to receive(:gets) do
           sleep 4.8
@@ -60,142 +95,39 @@ describe Sip2::Connection do
   end
 
   describe '#login' do
-    it 'sends a well formed login packet to socket' do
-      expect(connection).to(
-        receive(:send_message).
-          with('9300CNuser_id|COpassw0rd|AY1AZF594').
-          and_return('941AY1AZFDFC')
+    it 'creates a Messages::Login and calls action_message' do
+      login_message = instance_double 'Sip2::Messages::Login'
+      expect(Sip2::Messages::Login).to(
+        receive(:new).
+          with(connection).
+          and_return(login_message)
       )
 
-      expect(connection.login(username: 'user_id', password: 'passw0rd')).to be_truthy
-    end
+      expect(login_message).to(
+        receive(:action_message).
+          with(username: 'user_id', password: 'passw0rd')
+      )
 
-    context 'location code is provided' do
-      it 'sends a well formed login packet to socket' do
-        expect(connection).to(
-          receive(:send_message).
-            with('9300CNuser_id|COpassw0rd|CPfoo|AY1AZF341').
-            and_return('941AY1AZFDFC')
-        )
-
-        expect(
-          connection.login(username: 'user_id', password: 'passw0rd', location_code: 'foo')
-        ).to be_truthy
-      end
-    end
-
-    context 'error detection is disabled' do
-      let(:connection) { Sip2::Connection.new(socket: socket, ignore_error_detection: true) }
-
-      it 'returns true even if the checksum is wrong' do
-        expect(connection).to(
-          receive(:send_message).
-            with('9300CNuser_id|COpassw0rd|AY1AZF594').
-            and_return('941AY6AZABCD')
-        )
-
-        expect(connection.login(username: 'user_id', password: 'passw0rd')).to be_truthy
-      end
-    end
-
-    context 'server responds with login failure' do
-      it 'returns false' do
-        expect(connection).to(
-          receive(:send_message).
-            with('9300CNuser_id|COpassw0rd1|AY1AZF563').
-            and_return('940AY1AZFDFD')
-        )
-
-        expect(connection.login(username: 'user_id', password: 'passw0rd1')).to be_falsey
-      end
+      connection.login(username: 'user_id', password: 'passw0rd')
     end
   end
 
   describe '#patron_information' do
-    it 'sends a well formed patron information packet' do
-      Timecop.freeze do
-        request = "63000#{timestamp}          AO|AAuser_uid|AC|ADpassw0rd|AY1AZ"
-        request += checksum(request)
-        response = '64FOOBAR|AY1AZFBFB'
+    it 'creates a Messages::PatronInformation and calls action_message' do
+      patron_information_message =
+        instance_double 'Sip2::Messages::PatronInformation'
+      expect(Sip2::Messages::PatronInformation).to(
+        receive(:new).
+          with(connection).
+          and_return(patron_information_message)
+      )
 
-        expect(connection).to receive(:send_message).with(request).and_return response
+      expect(patron_information_message).to(
+        receive(:action_message).
+          with(uid: 'user_uid', password: 'passw0rd')
+      )
 
-        info = connection.patron_information(uid: 'user_uid', password: 'passw0rd')
-        expect(info).to be_a Sip2::PatronInformation
-        expect(info.raw_response).to eq response
-      end
+      connection.patron_information(uid: 'user_uid', password: 'passw0rd')
     end
-
-    context 'error detection is disabled' do
-      let(:connection) { Sip2::Connection.new(socket: socket, ignore_error_detection: true) }
-
-      it 'returns patron information even if the checksum is wrong' do
-        Timecop.freeze do
-          request = "63000#{timestamp}          AO|AAuser_uid|AC|ADpassw0rd|AY1AZ"
-          request += checksum(request)
-          response = '64FOOBAR|AY1AZABCD'
-
-          expect(connection).to receive(:send_message).with(request).and_return response
-
-          info = connection.patron_information(uid: 'user_uid', password: 'passw0rd')
-          expect(info).to be_a Sip2::PatronInformation
-          expect(info.raw_response).to eq response
-        end
-      end
-    end
-
-    context 'server responds with invalid packet' do
-      it 'returns nil' do
-        request = "63000#{timestamp}          AO|AAuser_uid|AC|ADpassw0rd|AY1AZ"
-        request += checksum(request)
-        expect(connection).to receive(:send_message).with(request).and_return '64FOOBAR|AY1AZABCD'
-
-        info = connection.patron_information(uid: 'user_uid', password: 'passw0rd')
-        expect(info).to be_nil
-      end
-    end
-
-    context 'socket closed before response received' do
-      it 'returns nil' do
-        request = "63000#{timestamp}          AO|AAuser_uid|AC|ADpassw0rd|AY1AZ"
-        request += checksum(request)
-
-        expect(connection).to receive(:send_message).with(request).and_return nil
-
-        info = connection.patron_information(uid: 'user_uid', password: 'passw0rd')
-        expect(info).to be_nil
-      end
-    end
-
-    context 'a terminal password is provided' do
-      it 'sends a well formed patron information packet to socket' do
-        Timecop.freeze do
-          request = "63000#{timestamp}          AO|AAuser_uid|ACt3rmp4ss|ADpassw0rd|AY1AZ"
-          request += checksum(request)
-          response = '64FOOBAR|AY1AZFBFB'
-
-          expect(connection).to receive(:send_message).with(request).and_return response
-
-          info =
-            connection.patron_information(
-              uid: 'user_uid', password: 'passw0rd', terminal_password: 't3rmp4ss'
-            )
-          expect(info).to be_a Sip2::PatronInformation
-          expect(info.raw_response).to eq response
-        end
-      end
-    end
-  end
-
-  def checksum(message)
-    check = 0
-    message.each_char { |m| check += m.ord }
-    check += "\0".ord
-    check = (check ^ 0xFFFF) + 1
-    format '%<check>4.4X', check: check
-  end
-
-  def timestamp
-    Time.now.strftime('%Y%m%d    %H%M%S')
   end
 end
