@@ -19,10 +19,14 @@ describe Sip2::Messages::PatronInformation do
       Timecop.freeze do
         response = '64FOOBAR|AY1AZFBFB'
 
-        expect(connection).to(
+        allow(connection).to(
           receive(:send_message).
             with("63000#{timestamp}          AO|AAuser_uid|AC|ADpassw0rd").
             and_return(response)
+        )
+        expect(connection).to(
+          receive(:send_message).
+            with("63000#{timestamp}          AO|AAuser_uid|AC|ADpassw0rd")
         )
 
         expect(action_message).to be_a Sip2::Responses::PatronInformation
@@ -32,17 +36,21 @@ describe Sip2::Messages::PatronInformation do
 
     context 'when the connection doesnt return a message' do
       it 'returns nil' do
-        expect(connection).to(
+        allow(connection).to(
           receive(:send_message).
             with("63000#{timestamp}          AO|AAuser_uid|AC|ADpassw0rd").
             and_return(nil)
+        )
+        expect(connection).to(
+          receive(:send_message).
+            with("63000#{timestamp}          AO|AAuser_uid|AC|ADpassw0rd")
         )
 
         expect(action_message).to be_nil
       end
     end
 
-    context 'a terminal password is provided' do
+    context 'when a terminal password is provided' do
       subject(:action_message) do
         patron_information_message.
           action_message(uid: username, password: password, terminal_password: 't3rmp4ss')
@@ -52,10 +60,14 @@ describe Sip2::Messages::PatronInformation do
         Timecop.freeze do
           response = '64FOOBAR|AY1AZFBFB'
 
-          expect(connection).to(
+          allow(connection).to(
             receive(:send_message).
               with("63000#{timestamp}          AO|AAuser_uid|ACt3rmp4ss|ADpassw0rd").
               and_return(response)
+          )
+          expect(connection).to(
+            receive(:send_message).
+              with("63000#{timestamp}          AO|AAuser_uid|ACt3rmp4ss|ADpassw0rd")
           )
 
           expect(action_message).to be_a Sip2::Responses::PatronInformation

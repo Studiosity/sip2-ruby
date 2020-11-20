@@ -3,22 +3,22 @@
 require 'spec_helper'
 
 describe Sip2::NonBlockingSocket do
-  subject(:socket) { Sip2::NonBlockingSocket.new(:INET, :STREAM) }
+  subject(:socket) { described_class.new(:INET, :STREAM) }
 
   it { is_expected.to be_a Socket }
 
   describe '.connect' do
-    subject(:connect_socket) { Sip2::NonBlockingSocket.connect(host: host, port: port) }
+    subject(:connect_socket) { described_class.connect(host: host, port: port) }
 
     let(:host) { '127.0.0.1' }
     let(:port) { 51_337 }
 
     it 'initialises non-blocking socket' do
       with_server(port: port) do
-        expect(Sip2::NonBlockingSocket).to(
+        expect(described_class).to(
           receive(:new).with(Socket::AF_INET, Socket::SOCK_STREAM, 0).and_call_original
         )
-        expect(connect_socket).to be_a Sip2::NonBlockingSocket
+        expect(connect_socket).to be_a described_class
       end
     end
 
@@ -30,7 +30,7 @@ describe Sip2::NonBlockingSocket do
 
     context 'when the socket timeout is specified' do
       subject(:connect_socket) do
-        Sip2::NonBlockingSocket.connect(host: host, port: port, timeout: 4321)
+        described_class.connect(host: host, port: port, timeout: 4321)
       end
 
       it 'assigns override to the connection timeout' do
@@ -41,7 +41,7 @@ describe Sip2::NonBlockingSocket do
     end
 
     it 'sets the connection timeout' do
-      with_server(port: port) { expect(subject.connection_timeout).to eq 5 }
+      with_server(port: port) { expect(connect_socket.connection_timeout).to eq 5 }
     end
 
     it 'raises connection refused (if there is no server to connect to)' do

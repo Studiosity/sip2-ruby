@@ -92,7 +92,7 @@ module Sip2
         raw_response[/\|#{message_id}(.*?)\|/, 1]
       end
 
-      def parse_datetime(position) # rubocop:disable Metrics/AbcSize
+      def parse_datetime(position)
         match = raw_response.match(/\A#{self.class::RESPONSE_ID}.{#{position}}#{DATE_MATCH_REGEX}/)
         return unless match
 
