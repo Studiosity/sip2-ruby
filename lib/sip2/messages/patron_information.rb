@@ -33,7 +33,7 @@ module Sip2
       end
 
       def handle_response(response)
-        return unless /\A#{Sip2::Responses::PatronInformation::RESPONSE_ID}/.match?(response)
+        return unless /\A#{Sip2::Responses::PatronInformation::RESPONSE_ID}/o.match?(response)
 
         Sip2::Responses::PatronInformation.new response
       end
