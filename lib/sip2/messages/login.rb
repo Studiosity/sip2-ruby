@@ -3,16 +3,17 @@
 module Sip2
   module Messages
     #
-    # Sip2 Login message module
+    # Sip2 Login message
     #
-    module Login
-      def self.included(klass)
-        klass.add_connection_module :login
-      end
-
+    # https://developers.exlibrisgroup.com/wp-content/uploads/2020/01/3M-Standard-Interchange-Protocol-Version-2.00.pdf
+    #
+    # Request message  93
+    # Response message 94
+    #
+    class Login < Base
       private
 
-      def build_login_message(username:, password:, location_code: nil)
+      def build_message(username:, password:, location_code: nil)
         code = '93' # Login
         uid_algorithm = pw_algorithm = '0' # Plain text
         username_field = "CN#{username}"
@@ -25,8 +26,8 @@ module Sip2
         ].join
       end
 
-      def handle_login_response(response)
-        sequence_and_checksum_valid?(response) && response[/\A94([01])AY/, 1] == '1'
+      def handle_response(response)
+        response[/\A94([01])AY/, 1] == '1'
       end
     end
   end

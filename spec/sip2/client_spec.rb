@@ -4,7 +4,8 @@ require 'spec_helper'
 
 describe Sip2::Client do
   describe '#connect' do
-    let(:client) { Sip2::Client.new(host: '127.0.0.1', port: 4321) }
+    let(:client) { Sip2::Client.new(host: '127.0.0.1', port: port) }
+    let(:port) { 4321 }
 
     it 'yields sip connection' do
       socket = instance_double 'Sip2::NonBlockingSocket'
@@ -24,6 +25,34 @@ describe Sip2::Client do
           and_return(connection)
       )
       expect { |block| client.connect(&block) }.to yield_with_args connection
+    end
+
+    it 'can connect to a server' do
+      with_server(port: port) do |server|
+        Thread.new do
+          client = server.accept
+          client.write "hey thereAY1AZFB1C\r"
+          client.close
+        end
+
+        response = client.connect { |connection| connection.send_message 'hi' }
+        expect(response).to eq 'hey thereAY1AZFB1C'
+      end
+    end
+
+    context 'server responds with invalid packet' do
+      it 'returns nil' do
+        with_server(port: port) do |server|
+          Thread.new do
+            client = server.accept
+            client.write "64FOOBAR|AY1AZABCD\r"
+            client.close
+          end
+
+          response = client.connect { |connection| connection.send_message 'hi' }
+          expect(response).to be_nil
+        end
+      end
     end
 
     context 'when overriding the port' do
@@ -80,7 +109,6 @@ describe Sip2::Client do
       let(:client) { Sip2::Client.new(host: host, port: port, ssl_context: ssl_context) }
       let(:ssl_context) { OpenSSL::SSL::SSLContext.new }
       let(:host) { 'sip2test.ddns.net' }
-      let(:port) { 4321 }
 
       it 'yields sip connection' do
         socket = instance_double 'Sip2::NonBlockingSocket'
@@ -116,12 +144,12 @@ describe Sip2::Client do
         with_ssl_server(port: port) do |server|
           Thread.new do
             client = server.accept
-            client.write "hey there\r"
+            client.write "hey thereAY1AZFB1C\r"
             client.close
           end
 
           response = client.connect { |connection| connection.send_message 'hi' }
-          expect(response).to eq 'hey there'
+          expect(response).to eq 'hey thereAY1AZFB1C'
         end
       end
 
@@ -190,12 +218,12 @@ describe Sip2::Client do
             with_ssl_server(port: port) do |server|
               Thread.new do
                 client = server.accept
-                client.write "hey there\r"
+                client.write "hey thereAY1AZFB1C\r"
                 client.close
               end
 
               response = client.connect { |connection| connection.send_message 'hi' }
-              expect(response).to eq 'hey there'
+              expect(response).to eq 'hey thereAY1AZFB1C'
             end
           end
         end

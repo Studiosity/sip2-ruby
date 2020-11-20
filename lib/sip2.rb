@@ -6,6 +6,7 @@ require 'openssl'
 
 require 'sip2/patron_information'
 
+require 'sip2/messages/base'
 require 'sip2/messages/login'
 require 'sip2/messages/patron_information'
 
