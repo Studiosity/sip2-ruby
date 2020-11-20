@@ -25,7 +25,7 @@ describe Sip2::Messages::PatronInformation do
             and_return(response)
         )
 
-        expect(action_message).to be_a Sip2::PatronInformation
+        expect(action_message).to be_a Sip2::Responses::PatronInformation
         expect(action_message.raw_response).to eq response
       end
     end
@@ -58,7 +58,7 @@ describe Sip2::Messages::PatronInformation do
               and_return(response)
           )
 
-          expect(action_message).to be_a Sip2::PatronInformation
+          expect(action_message).to be_a Sip2::Responses::PatronInformation
           expect(action_message.raw_response).to eq response
         end
       end

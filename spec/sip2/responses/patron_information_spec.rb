@@ -2,8 +2,8 @@
 
 require 'spec_helper'
 
-describe Sip2::PatronInformation do
-  let(:patron_information) { Sip2::PatronInformation.new response }
+describe Sip2::Responses::PatronInformation do
+  let(:patron_information) { Sip2::Responses::PatronInformation.new response }
 
   shared_examples 'when flag not set' do
     let(:response) { '64              00020180508    21454400000' }

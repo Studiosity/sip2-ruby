@@ -7,8 +7,17 @@ module Sip2
     #
     # https://developers.exlibrisgroup.com/wp-content/uploads/2020/01/3M-Standard-Interchange-Protocol-Version-2.00.pdf
     #
-    # Request message  93
+    # Request message 93
+    #  * UID algorithm       - 1 char, fixed-length required field; the algorithm used
+    #                          to encrypt the user id
+    #  * PWD algorithm       - 1 char, fixed-length required field; the algorithm used
+    #                          to encrypt the password
+    #  * login user id  - CN - variable-length required field
+    #  * login password - CO - variable-length required field
+    #  * location code  - CP - variable-length required field
+    #
     # Response message 94
+    #  * ok - 1 char, fixed-length required field: 0 or 1
     #
     class Login < Base
       private
