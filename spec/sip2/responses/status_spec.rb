@@ -75,7 +75,13 @@ describe Sip2::Responses::Status do
 
     let(:response) { '98      23476520180508    2145442.00' }
 
-    it { is_expected.to eq '234' }
+    it { is_expected.to eq 234 }
+
+    context 'when the timeout is not a number' do
+      let(:response) { '98      ABC76520180508    2145442.00' }
+
+      it { is_expected.to be_nil }
+    end
   end
 
   describe '#retries_allowed' do
@@ -83,7 +89,13 @@ describe Sip2::Responses::Status do
 
     let(:response) { '98      23476520180508    2145442.00' }
 
-    it { is_expected.to eq '765' }
+    it { is_expected.to eq 765 }
+
+    context 'when the retries allowed is not a number' do
+      let(:response) { '98      234ABC20180508    2145442.00' }
+
+      it { is_expected.to be_nil }
+    end
   end
 
   describe '#date_sync' do
@@ -111,7 +123,13 @@ describe Sip2::Responses::Status do
 
     let(:response) { '98      23476520180508    2145442.00' }
 
-    it { is_expected.to eq '2.00' }
+    it { is_expected.to eq 2.0 }
+
+    context 'when the protocol version is not a number' do
+      let(:response) { '98      23476520180508    2145442.A0' }
+
+      it { is_expected.to be_nil }
+    end
   end
 
   describe '#institution_id' do
@@ -125,6 +143,12 @@ describe Sip2::Responses::Status do
       let(:response) { 'FOO|AO|BAR' }
 
       it { is_expected.to eq '' }
+    end
+
+    context 'when the institution id is directly after the fixed component of the response' do
+      let(:response) { '98YYYNYN99900320201123    1404002.00AOMy institution|AMSuper Library|etc' }
+
+      it { is_expected.to eq 'My institution' }
     end
 
     context 'when there is not institution id' do

@@ -85,11 +85,11 @@ module Sip2
       end
 
       def parse_optional_boolean(message_id)
-        raw_response[/\|#{message_id}([YN])\|/, 1] == 'Y'
+        raw_response[/(?:\A.{#{self.class::FIXED_LENGTH_CHARS}}|\|)#{message_id}([YN])\|/, 1] == 'Y'
       end
 
       def parse_text(message_id)
-        raw_response[/\|#{message_id}(.*?)\|/, 1]
+        raw_response[/(?:\A.{#{self.class::FIXED_LENGTH_CHARS}}|\|)#{message_id}(.*?)\|/, 1]
       end
 
       def parse_datetime(position)

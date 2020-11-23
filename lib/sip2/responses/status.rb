@@ -27,6 +27,7 @@ module Sip2
     #
     class Status < Base
       RESPONSE_ID = 98
+      FIXED_LENGTH_CHARS = 36 # 34 chars + 2 for the header
       SUPPORTED_MESSAGES = {
         patron_status_request: 0,
         checkout: 1,
@@ -71,11 +72,13 @@ module Sip2
       end
 
       def timeout_period
-        parse_fixed_response 6, 3
+        timeout = parse_fixed_response 6, 3
+        timeout.to_i if timeout.match?(/\A\d+\z/)
       end
 
       def retries_allowed
-        parse_fixed_response 9, 3
+        retries = parse_fixed_response 9, 3
+        retries.to_i if retries.match?(/\A\d+\z/)
       end
 
       def date_sync
@@ -83,7 +86,8 @@ module Sip2
       end
 
       def protocol_version
-        parse_fixed_response 30, 4
+        version = parse_fixed_response 30, 4
+        version.to_f if version.match?(/\A\d\.\d\d\z/)
       end
 
       def institution_id

@@ -42,6 +42,7 @@ module Sip2
     #
     class PatronInformation < Base
       RESPONSE_ID = 64
+      FIXED_LENGTH_CHARS = 61 # 59 chars + 2 for the header
 
       def charge_privileges_denied?
         parse_fixed_boolean 0
