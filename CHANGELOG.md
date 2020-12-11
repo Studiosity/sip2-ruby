@@ -3,6 +3,10 @@
 ## Unreleased
 - None
 
+## [0.2.2](releases/tag/v0.2.2) - 2020-12-11
+### Added
+- [#4](https://github.com/Studiosity/sip2-ruby/pull/4) Add status message (99) support
+
 ## [0.2.1](releases/tag/v0.2.1) - 2020-11-18
 ### Added
 - [#2](https://github.com/Studiosity/sip2-ruby/pull/2) Add TLS support
