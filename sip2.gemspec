@@ -16,14 +16,16 @@ Gem::Specification.new do |spec|
   spec.homepage      = 'https://github.com/Studiosity/sip2-ruby'
   spec.license       = 'MIT'
 
-  spec.files         = `git ls-files lib`.split("\n") + ['LICENSE']
+  spec.files         = `git ls-files lib`.split("\n") + %w[LICENSE README.md]
   spec.require_paths = ['lib']
 
   spec.required_ruby_version = '>= 2.4.0'
 
   spec.add_development_dependency 'bundler', '~> 2'
-  spec.add_development_dependency 'rake', '~> 12.0'
+  spec.add_development_dependency 'rake', '~> 13.0'
   spec.add_development_dependency 'rspec', '~> 3.0'
-  spec.add_development_dependency 'rubocop', '~> 0.60'
+  spec.add_development_dependency 'rubocop', '~> 1.0'
+  spec.add_development_dependency 'rubocop-performance', '~> 1.0'
+  spec.add_development_dependency 'rubocop-rspec', '~> 2.0'
   spec.add_development_dependency 'timecop', '~> 0.9'
 end

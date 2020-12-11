@@ -9,7 +9,7 @@ describe Sip2::Connection do
       write: nil, gets: "default-result\r", connection_timeout: nil
     )
   end
-  let(:connection) { Sip2::Connection.new(socket: socket, ignore_error_detection: false) }
+  let(:connection) { described_class.new(socket: socket, ignore_error_detection: false) }
 
   describe '#send_message' do
     subject(:send_message) { connection.send_message 'a message' }
@@ -20,41 +20,47 @@ describe Sip2::Connection do
     end
 
     it 'calls to underlying socket `gets` method and returns result' do
-      expect(socket).to receive(:gets).with("\r").and_return "messageAY1AZFBB5\r"
+      allow(socket).to receive(:gets).with("\r").and_return "messageAY1AZFBB5\r"
+      expect(socket).to receive(:gets).with "\r"
       expect(send_message).to eq 'messageAY1AZFBB5'
     end
 
     context 'when the returned message doesnt pass the checksum test' do
       it 'returns nil' do
-        expect(socket).to receive(:gets).with("\r").and_return "messageAY11234\r"
+        allow(socket).to receive(:gets).with("\r").and_return "messageAY11234\r"
+        expect(socket).to receive(:gets).with "\r"
         expect(send_message).to be_nil
       end
     end
 
     context 'when the socket is closed before response received (returns nil)' do
       it 'returns nil' do
-        expect(socket).to receive(:gets).with("\r").and_return nil
+        allow(socket).to receive(:gets).with("\r").and_return nil
+        expect(socket).to receive(:gets).with "\r"
         expect(send_message).to be_nil
       end
     end
 
     context 'when the returned message has a sequence mismatch' do
       it 'returns nil' do
-        expect(socket).to receive(:gets).with("\r").and_return "messageAY2AZFBB\r"
+        allow(socket).to receive(:gets).with("\r").and_return "messageAY2AZFBB\r"
+        expect(socket).to receive(:gets).with "\r"
         expect(send_message).to be_nil
       end
     end
 
-    context 'error detection is disabled' do
-      let(:connection) { Sip2::Connection.new(socket: socket, ignore_error_detection: true) }
+    context 'when error detection is disabled' do
+      let(:connection) { described_class.new(socket: socket, ignore_error_detection: true) }
 
       it 'returns the message even if the sequence is wrong' do
-        expect(socket).to receive(:gets).with("\r").and_return "messageAY2AZFBB\r"
+        allow(socket).to receive(:gets).with("\r").and_return "messageAY2AZFBB\r"
+        expect(socket).to receive(:gets).with "\r"
         expect(send_message).to eq 'messageAY2AZFBB'
       end
 
       it 'returns the message even if the checksum is wrong' do
-        expect(socket).to receive(:gets).with("\r").and_return "messageAY11234\r"
+        allow(socket).to receive(:gets).with("\r").and_return "messageAY11234\r"
+        expect(socket).to receive(:gets).with "\r"
         expect(send_message).to eq 'messageAY11234'
       end
     end
@@ -97,11 +103,12 @@ describe Sip2::Connection do
   describe '#login' do
     it 'creates a Messages::Login and calls action_message' do
       login_message = instance_double 'Sip2::Messages::Login'
-      expect(Sip2::Messages::Login).to(
+      allow(Sip2::Messages::Login).to(
         receive(:new).
           with(connection).
           and_return(login_message)
       )
+      expect(Sip2::Messages::Login).to receive(:new).with(connection)
 
       expect(login_message).to(
         receive(:action_message).
@@ -116,11 +123,12 @@ describe Sip2::Connection do
     it 'creates a Messages::PatronInformation and calls action_message' do
       patron_information_message =
         instance_double 'Sip2::Messages::PatronInformation'
-      expect(Sip2::Messages::PatronInformation).to(
+      allow(Sip2::Messages::PatronInformation).to(
         receive(:new).
           with(connection).
           and_return(patron_information_message)
       )
+      expect(Sip2::Messages::PatronInformation).to receive(:new).with(connection)
 
       expect(patron_information_message).to(
         receive(:action_message).

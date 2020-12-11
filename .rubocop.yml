@@ -1,3 +1,7 @@
+require:
+  - rubocop-performance
+  - rubocop-rspec
+
 AllCops:
   TargetRubyVersion: 2.4
   NewCops: enable
@@ -8,15 +12,6 @@ Layout/DotPosition:
 Layout/LineLength:
   Max: 100
 
-Layout/SpaceAroundMethodCallOperator:
-  Enabled: true
-
-Lint/RaiseException:
-  Enabled: true
-
-Lint/StructNewOverride:
-  Enabled: true
-
 Metrics/BlockLength:
   Exclude:
     - "**/*_spec.rb"
@@ -24,14 +19,14 @@ Metrics/BlockLength:
 Metrics/ClassLength:
   Enabled: false
 
-Style/ExponentialNotation:
-  Enabled: true
+RSpec/ExampleLength:
+  Max: 15
 
-Style/HashEachMethods:
-  Enabled: true
+RSpec/MessageSpies:
+  EnforcedStyle: receive
 
-Style/HashTransformKeys:
-  Enabled: true
+RSpec/MultipleExpectations:
+  Max: 3
 
-Style/HashTransformValues:
-  Enabled: true
+RSpec/NestedGroups:
+  Max: 5

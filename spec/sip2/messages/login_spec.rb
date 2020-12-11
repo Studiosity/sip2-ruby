@@ -16,38 +16,41 @@ describe Sip2::Messages::Login do
     let(:password) { 'passw0rd' }
 
     it 'sends a well formed login message to the connection' do
-      expect(connection).to(
+      allow(connection).to(
         receive(:send_message).
           with('9300CNuser_id|COpassw0rd').
           and_return('941AY1AZFDFC')
       )
+      expect(connection).to receive(:send_message).with('9300CNuser_id|COpassw0rd')
 
       expect(action_message).to be_truthy
     end
 
-    context 'location code is provided' do
+    context 'when location code is provided' do
       subject(:action_message) do
         login_message.action_message(username: username, password: password, location_code: 'foo')
       end
 
       it 'sends a well formed login message to the connection' do
-        expect(connection).to(
+        allow(connection).to(
           receive(:send_message).
             with('9300CNuser_id|COpassw0rd|CPfoo').
             and_return('941AY1AZFDFC')
         )
+        expect(connection).to receive(:send_message).with('9300CNuser_id|COpassw0rd|CPfoo')
 
         expect(action_message).to be_truthy
       end
     end
 
-    context 'server responds with login failure' do
+    context 'when the server responds with login failure' do
       it 'returns false' do
-        expect(connection).to(
+        allow(connection).to(
           receive(:send_message).
             with('9300CNuser_id|COpassw0rd').
             and_return('940AY1AZFDFD')
         )
+        expect(connection).to receive(:send_message).with('9300CNuser_id|COpassw0rd')
 
         expect(action_message).to be_falsey
       end
