@@ -15,8 +15,11 @@ require 'sip2/messages/status'
 
 module Sip2
   class TimeoutError < StandardError; end
+
   class ConnectionTimeout < TimeoutError; end
+
   class WriteTimeout < TimeoutError; end
+
   class ReadTimeout < TimeoutError; end
 end
 
