@@ -57,7 +57,7 @@ module Sip2
         msg = response[/\|#{message_id}([YN])\|/, 1]
         return true if msg == 'Y'
         return false if msg == 'N'
-        nil
+        false
       end
 
       def parse_text(response, message_id)

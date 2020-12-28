@@ -30,6 +30,11 @@ describe Sip2::Responses::PatronStatus do
       let(:response) { invalid_response }
       it { is_expected.to be false }
     end
+
+    context 'Kona - Real message' do
+      let(:response) { '24YYYY      YY  00020201228    100524AEFines test8|AA21906009136618|BLY|CQN|BV140|AFGreetings from Koha.  -- Patron owes 140.00|AO|AY2AZDA5A' }
+      it { is_expected.to be true }
+    end
   end
 
   describe '#renewal_privileges_denied?' do
@@ -122,4 +127,5 @@ describe Sip2::Responses::PatronStatus do
       it { is_expected.to eq('The institution id is invalid.') }
     end
   end
+
 end
