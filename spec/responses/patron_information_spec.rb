@@ -34,12 +34,12 @@ describe Sip2::Responses::PatronInformation do
     it { is_expected.to be_truthy }
 
     context 'false response' do
-      let(:response) { :raw_response_incorrect_barcode }
+      let(:response) { raw_response_incorrect_barcode }
       it { is_expected.to be_falsey }
     end
 
     context 'invalid response' do
-      let(:response) { :invalid_response }
+      let(:response) { invalid_response }
       it { is_expected.to be_falsey }
     end
   end

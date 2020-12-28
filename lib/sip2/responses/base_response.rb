@@ -10,7 +10,7 @@ module Sip2
       @@response_objects = {}
 
       def initialize(raw_response)
-        @raw_response = raw_response
+        @raw_response = raw_response.strip
       end
 
       # Look up the proepr response class for the given response
