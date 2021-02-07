@@ -1,7 +1,8 @@
 # Changelog
 
 ## Unreleased
-- None
+### Added
+- [#5](https://github.com/Studiosity/sip2-ruby/pull/5) Handle trailing newline characters
 
 ## [0.2.2](releases/tag/v0.2.2) - 2020-12-11
 ### Added
