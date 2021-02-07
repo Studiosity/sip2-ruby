@@ -16,7 +16,10 @@ module Sip2
     def send_message(message)
       message = with_checksum with_error_detection message
       write_with_timeout message
-      response = read_with_timeout
+      # Read the response and strip any leading newline
+      # - Some ACS terminate messages with /r/n by mistake.
+      #   We need to remove from the front (i.e. buffer remnant from the previous message)
+      response = read_with_timeout&.[](/\A\n?(.*)\z/, 1)
       response if sequence_and_checksum_valid? response
     ensure
       @sequence += 1
