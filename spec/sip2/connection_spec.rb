@@ -33,6 +33,22 @@ describe Sip2::Connection do
       end
     end
 
+    context 'when the returned message has a leading newline character' do
+      it 'strips the newline and returns result' do
+        allow(socket).to receive(:gets).with("\r").and_return "\nmessageAY1AZFBB5\r"
+        expect(socket).to receive(:gets).with "\r"
+        expect(send_message).to eq 'messageAY1AZFBB5'
+      end
+    end
+
+    context 'when the returned message has multiple leading newline characters' do
+      it 'returns nil (fails the checksum)' do
+        allow(socket).to receive(:gets).with("\r").and_return "\n\nmessageAY11234\r"
+        expect(socket).to receive(:gets).with "\r"
+        expect(send_message).to be_nil
+      end
+    end
+
     context 'when the socket is closed before response received (returns nil)' do
       it 'returns nil' do
         allow(socket).to receive(:gets).with("\r").and_return nil
