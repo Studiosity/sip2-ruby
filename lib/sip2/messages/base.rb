@@ -42,8 +42,8 @@ module Sip2
       # @return returns `nil` if there was no valid message returned.
       #         Otherwise value will depend on the specific message. See the `handle_response`
       #         method in those classes for more information
-      def action_message(*args)
-        message = build_message(*args)
+      def action_message(**args)
+        message = build_message(**args)
         response = @connection.send_message message
         return if response.nil?
 
