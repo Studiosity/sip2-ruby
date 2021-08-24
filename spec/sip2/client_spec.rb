@@ -133,18 +133,18 @@ describe Sip2::Client do
     context 'when specifying an SSL context' do
       let(:client) { described_class.new(host: host, port: port, ssl_context: ssl_context) }
       let(:ssl_context) { OpenSSL::SSL::SSLContext.new }
-      let(:host) { 'sip2test.ddns.net' }
+      let(:host) { 'sip2test.mooo.com' }
 
       it 'yields sip connection' do # rubocop:disable RSpec/ExampleLength,RSpec/MultipleExpectations
         socket = instance_double 'Sip2::NonBlockingSocket'
         allow(Sip2::NonBlockingSocket).to(
           receive(:connect).
-            with(host: 'sip2test.ddns.net', port: 4321, timeout: 5).
+            with(host: 'sip2test.mooo.com', port: 4321, timeout: 5).
             and_return(socket)
         )
         expect(Sip2::NonBlockingSocket).to(
           receive(:connect).
-            with(host: 'sip2test.ddns.net', port: 4321, timeout: 5)
+            with(host: 'sip2test.mooo.com', port: 4321, timeout: 5)
         )
 
         ssl_socket = instance_double 'OpenSSL::SSL::SSLSocket'
@@ -157,10 +157,10 @@ describe Sip2::Client do
           receive(:new).
             with(socket, ssl_context)
         )
-        expect(ssl_socket).to receive(:hostname=).with 'sip2test.ddns.net'
+        expect(ssl_socket).to receive(:hostname=).with 'sip2test.mooo.com'
         expect(ssl_socket).to receive(:sync_close=).with true
         expect(ssl_socket).to receive(:connect)
-        expect(ssl_socket).to receive(:post_connection_check).with 'sip2test.ddns.net'
+        expect(ssl_socket).to receive(:post_connection_check).with 'sip2test.mooo.com'
 
         expect(ssl_socket).to receive(:close)
 
@@ -191,7 +191,7 @@ describe Sip2::Client do
       end
 
       context 'when the host doesnt match the certificate' do
-        let(:host) { 'sip2error.ddns.net' }
+        let(:host) { 'sip2error.mooo.com' }
 
         it 'can connect to an SSL server' do
           with_ssl_server(port: port) do |server|
@@ -202,7 +202,7 @@ describe Sip2::Client do
             expect { client.connect }.to(
               raise_error(
                 OpenSSL::SSL::SSLError,
-                'hostname "sip2error.ddns.net" does not match the server certificate'
+                'hostname "sip2error.mooo.com" does not match the server certificate'
               )
             )
           end
@@ -249,7 +249,7 @@ describe Sip2::Client do
         end
 
         context 'when the client context specifies the certificate' do
-          before { ssl_context.ca_file = 'test_server/cert/ca-cert.pem' }
+          before { ssl_context.ca_file = 'test_server/cert/ca-cert.crt' }
 
           it 'can connect to an SSL server' do
             with_ssl_server(port: port) do |server|
