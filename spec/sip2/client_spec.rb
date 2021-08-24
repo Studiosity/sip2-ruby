@@ -234,10 +234,14 @@ describe Sip2::Client do
         it 'raises an SSL error when trying to connect' do
           with_ssl_server(port: port) do |server|
             Thread.new do
-              expect { server.accept }.to raise_error(OpenSSL::SSL::SSLError, /tlsv1 alert unknown ca/)
+              expect { server.accept }.to(
+                raise_error(OpenSSL::SSL::SSLError, /tlsv1 alert unknown ca/)
+              )
             end
 
-            expect { client.connect }.to raise_error(OpenSSL::SSL::SSLError, /certificate verify failed/)
+            expect { client.connect }.to(
+              raise_error(OpenSSL::SSL::SSLError, /certificate verify failed/)
+            )
           end
         end
 
