@@ -30,9 +30,9 @@ module Sip2
           # indicating the connection is in progress.
           socket.connect_nonblock(sockaddr)
         rescue IO::WaitWritable
-          # IO.select will block until the socket is writable or the timeout
-          # is exceeded - whichever comes first.
-          if IO.select(nil, [socket], nil, timeout)
+          # wait_writable waits until the socket is writable without blocking,
+          # and returns self or `nil` when times out
+          if socket.wait_writable(timeout)
             begin
               # Verify there is now a good connection
               socket.connect_nonblock(sockaddr)
@@ -44,7 +44,7 @@ module Sip2
               raise
             end
           else
-            # IO.select returns nil when the socket is not ready before timeout
+            # wait_writable returns nil when the socket is not ready before timeout
             # seconds have elapsed
             socket.close
             raise ConnectionTimeout
