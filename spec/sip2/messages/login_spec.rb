@@ -56,4 +56,28 @@ describe Sip2::Messages::Login do
       end
     end
   end
+
+  context 'when connecting to a "real" server' do
+    let(:client) { Sip2::Client.new(host: '127.0.0.1', port: port) }
+    let(:port) { 4321 }
+
+    it 'calls through the connection with the login message' do
+      with_server(port: port) do |server|
+        server_message = nil
+
+        Thread.new do
+          client = server.accept
+          server_message = client.gets "\r"
+          client.write "941AY1AZFDFC\r"
+          client.close
+        end
+
+        response = client.connect do |connection|
+          connection.login username: 'user_name', password: 'pw0rd'
+        end
+        expect(response).to eq true
+        expect(server_message).to eq "9300CNuser_name|COpw0rd|AY1AZF607\r"
+      end
+    end
+  end
 end
