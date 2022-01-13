@@ -3,6 +3,10 @@
 ## Unreleased
 - None
 
+## [0.2.4](releases/tag/v0.2.4) - 2022-01-13
+### Fixed
+- [#7](https://github.com/Studiosity/sip2-ruby/pull/7) Fixed bug with Ruby 3 support
+
 ## [0.2.3](releases/tag/v0.2.3) - 2021-02-08
 ### Added
 - [#5](https://github.com/Studiosity/sip2-ruby/pull/5) Handle trailing newline characters
