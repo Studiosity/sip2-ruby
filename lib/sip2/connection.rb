@@ -25,12 +25,12 @@ module Sip2
       @sequence += 1
     end
 
-    def method_missing(method_name, *args)
+    def method_missing(method_name, *args, **kwargs)
       message_class = Messages::Base.message_class_for_method(method_name)
       if message_class.nil?
         super
       else
-        message_class.new(self).action_message(*args)
+        message_class.new(self).action_message(*args, **kwargs)
       end
     end
 

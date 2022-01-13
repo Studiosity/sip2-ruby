@@ -52,7 +52,7 @@ module Sip2
 
       private
 
-      def build_message(*)
+      def build_message(**)
         raise NotImplementedError, "#{self.class} must implement `build_message` method"
       end
 
