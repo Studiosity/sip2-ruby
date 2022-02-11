@@ -10,7 +10,10 @@ module Sip2
       @@response_objects = {}
 
       def initialize(raw_response)
-        @raw_response = raw_response.strip
+        @raw_response = raw_response&.strip
+        if @raw_response.nil? || @raw_response.empty?
+          raise ArgumentError, 'raw_response from SIP2 server cannot be blank'
+        end
       end
 
       # Look up the proepr response class for the given response

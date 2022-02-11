@@ -26,11 +26,6 @@ describe Sip2::Responses::PatronStatus do
       it { is_expected.to be true }
     end
 
-    context 'invalid response' do
-      let(:response) { invalid_response }
-      it { is_expected.to be false }
-    end
-
     context 'Kona - Real message' do
       let(:response) { "\n24YYYY      YY  00020201228    100524AEFines test8|AA21906009136618|BLY|CQN|BV140|AFGreetings from Koha.  -- Patron owes 140.00|AO|AY2AZDA5A" }
       it { is_expected.to be true }
@@ -48,11 +43,6 @@ describe Sip2::Responses::PatronStatus do
     context 'with a card with revoked charge privileges' do
       let(:response) { raw_response_card_renewal_denied }
       it { is_expected.to be true }
-    end
-
-    context 'invalid response' do
-      let(:response) { invalid_response }
-      it { is_expected.to be false }
     end
   end
 
@@ -72,11 +62,6 @@ describe Sip2::Responses::PatronStatus do
     context 'with outstanding fines' do
       let(:response) { raw_response_outstanding_fines }
       it { is_expected.to be true }
-    end
-
-    context 'invalid response' do
-      let(:response) { invalid_response }
-      it { is_expected.to be false }
     end
   end
 

@@ -20,11 +20,6 @@ describe Sip2::Responses::PatronInformation do
       let(:response) { raw_response_invalid_patron }
       it { is_expected.to be_falsey }
     end
-
-    context 'invalid response' do
-      let(:response) { invalid_response }
-      it { is_expected.to be_falsey }
-    end
   end
 
   describe 'authenticated?' do
@@ -35,11 +30,6 @@ describe Sip2::Responses::PatronInformation do
 
     context 'false response' do
       let(:response) { raw_response_incorrect_barcode }
-      it { is_expected.to be_falsey }
-    end
-
-    context 'invalid response' do
-      let(:response) { invalid_response }
       it { is_expected.to be_falsey }
     end
   end
@@ -70,11 +60,6 @@ describe Sip2::Responses::PatronInformation do
     context 'blank response' do
       let(:response) { 'FOO|AQ|BAR' }
       it { is_expected.to eq '' }
-    end
-
-    context 'no location information' do
-      let(:response) { invalid_response }
-      it { is_expected.to be_nil }
     end
   end
 end
