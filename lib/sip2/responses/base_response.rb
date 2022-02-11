@@ -37,8 +37,17 @@ module Sip2
       private
 
       # Retrieve a text string from the response.
-      def text(message_id)
-        parse_text(raw_response, message_id)
+      def text(message_id, length = nil)
+        if message_id.is_a?(Numeric)
+          parse_positional_text(raw_response, message_id, length)
+        else
+          parse_text(raw_response, message_id)
+        end
+      end
+
+      # Retrieve a numeric value of known length from the response.
+      def numeric(position, length)
+        raw_response[position + 2, length]
       end
 
       # Retrieve a boolean value from the response.
@@ -61,7 +70,11 @@ module Sip2
       end
 
       def parse_text(response, message_id)
-        response[/\|#{message_id}(.*?)\|/, 1]
+        response[/\|?#{message_id}(.*?)\|/, 1]
+      end
+
+      def parse_positional_text(response, position, length)
+        response[position + 2, length]
       end
 
       def parse_positional_argument(response, position)
