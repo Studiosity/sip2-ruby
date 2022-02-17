@@ -4,6 +4,8 @@ module Sip2
     # text and boolean fields from the response.
     #
     class BaseResponse
+      class EmptyResponseException < StandardError
+      end
       attr_reader :raw_response
 
       # rubocop:disable Style/ClassVars
@@ -11,9 +13,9 @@ module Sip2
 
       def initialize(raw_response)
         @raw_response = raw_response&.strip
-        if @raw_response.nil? || @raw_response.empty?
-          raise ArgumentError, 'raw_response from SIP2 server cannot be blank'
-        end
+        return unless @raw_response.nil? || @raw_response.empty?
+
+        raise EmptyResponseException, 'raw_response from SIP2 server cannot be blank'
       end
 
       # Look up the proepr response class for the given response

@@ -10,7 +10,7 @@ describe Sip2::Responses::BaseResponse do
     let(:raw_response) { '   ' }
 
     it 'raises an ArgumentError' do
-      expect { response_object }.to raise_error(ArgumentError)
+      expect { response_object }.to raise_error(described_class::EmptyResponseException)
     end
   end
 
@@ -18,7 +18,7 @@ describe Sip2::Responses::BaseResponse do
     let(:raw_response) { nil }
 
     it 'raises an ArgumentError' do
-      expect { response_object }.to raise_error(ArgumentError)
+      expect { response_object }.to raise_error(described_class::EmptyResponseException)
     end
   end
 
