@@ -46,13 +46,13 @@ describe Sip2::Responses::SelfCheckoutStatus do
   describe '#timeout_period' do
     subject { self_checkout_status.timeout_period }
 
-    it { is_expected.to eq('999') }
+    it { is_expected.to eq(999) }
   end
 
   describe '#retries_allowed' do
     subject { self_checkout_status.retries_allowed }
 
-    it { is_expected.to eq('999') }
+    it { is_expected.to eq(999) }
   end
 
   describe '#date_time_sync' do

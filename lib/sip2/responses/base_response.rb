@@ -50,9 +50,9 @@ module Sip2
         end
       end
 
-      # Retrieve a numeric value of known length from the response.
+      # Retrieve an integer value of known length from the response.
       def numeric(position, length)
-        raw_response[position + 2, length]
+        raw_response[position + 2, length].to_i
       end
 
       # Retrieve a boolean value from the response.
