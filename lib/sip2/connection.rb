@@ -16,6 +16,7 @@ module Sip2
     include Messages::Login
     include Messages::PatronInformation
     include Messages::PatronStatus
+    include Messages::SelfCheckoutStatus
 
     def initialize(socket, ignore_error_detection)
       @socket = socket

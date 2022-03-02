@@ -6,6 +6,22 @@ describe Sip2::Responses::BaseResponse do
   let(:raw_response) { '24 Y            00020101014    120240|BHGBP|BLY|CQN|AAJSMITH|AESmith, John|BV15.00|AY0AZE4FD' }
   # rubocop:enable LineLength
 
+  context 'when given a blank raw_response' do
+    let(:raw_response) { '   ' }
+
+    it 'raises an ArgumentError' do
+      expect { response_object }.to raise_error(described_class::EmptyResponseException)
+    end
+  end
+
+  context 'when given a nil raw_response' do
+    let(:raw_response) { nil }
+
+    it 'raises an ArgumentError' do
+      expect { response_object }.to raise_error(described_class::EmptyResponseException)
+    end
+  end
+
   describe '#text' do
     subject { response_object.send(:text, code) }
 

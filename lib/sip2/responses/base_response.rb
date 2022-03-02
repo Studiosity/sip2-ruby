@@ -4,13 +4,18 @@ module Sip2
     # text and boolean fields from the response.
     #
     class BaseResponse
+      class EmptyResponseException < StandardError
+      end
       attr_reader :raw_response
 
       # rubocop:disable Style/ClassVars
       @@response_objects = {}
 
       def initialize(raw_response)
-        @raw_response = raw_response.strip
+        @raw_response = raw_response&.strip
+        return unless @raw_response.nil? || @raw_response.empty?
+
+        raise EmptyResponseException, 'raw_response from SIP2 server cannot be blank'
       end
 
       # Look up the proepr response class for the given response
@@ -37,8 +42,17 @@ module Sip2
       private
 
       # Retrieve a text string from the response.
-      def text(message_id)
-        parse_text(raw_response, message_id)
+      def text(message_id, length = nil)
+        if message_id.is_a?(Numeric)
+          parse_positional_text(raw_response, message_id, length)
+        else
+          parse_text(raw_response, message_id)
+        end
+      end
+
+      # Retrieve an integer value of known length from the response.
+      def numeric(position, length)
+        raw_response[position + 2, length].to_i
       end
 
       # Retrieve a boolean value from the response.
@@ -61,7 +75,11 @@ module Sip2
       end
 
       def parse_text(response, message_id)
-        response[/\|#{message_id}(.*?)\|/, 1]
+        response[/\|?#{message_id}(.*?)\|/, 1]
+      end
+
+      def parse_positional_text(response, position, length)
+        response[position + 2, length]
       end
 
       def parse_positional_argument(response, position)
