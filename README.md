@@ -1,4 +1,4 @@
-[![Travis Build Status](http://img.shields.io/travis/Studiosity/sip2-ruby.svg?style=flat)](https://travis-ci.org/Studiosity/sip2-ruby)
+[![Github Build Status](https://github.com/Studiosity/sip2-ruby/actions/workflows/test.yml/badge.svg)](https://github.com/Studiosity/sip2-ruby/actions/workflows/test.yml)
 [![Gem Version](http://img.shields.io/gem/v/sip2.svg?style=flat)](#)
 
 # 3M™ Standard Interchange Protocol v2 (SIP2) client implementation in Ruby
