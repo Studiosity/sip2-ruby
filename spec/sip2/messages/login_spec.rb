@@ -75,7 +75,7 @@ describe Sip2::Messages::Login do
         response = client.connect do |connection|
           connection.login username: 'user_name', password: 'pw0rd'
         end
-        expect(response).to eq true
+        expect(response).to be true
         expect(server_message).to eq "9300CNuser_name|COpw0rd|AY1AZF607\r"
       end
     end
