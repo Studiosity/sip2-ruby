@@ -181,11 +181,12 @@ describe Sip2::Client do
         with_ssl_server(port: port) do |server|
           Thread.new do
             client = server.accept
+            client.gets "\r"
             client.write "hey thereAY1AZFB1C\r"
             client.close
           end
 
-          response = client.connect { |connection| connection.send_message 'hi' }
+          response = client.connect { |connection| connection.send_message "hi\r" }
           expect(response).to eq 'hey thereAY1AZFB1C'
         end
       end
@@ -252,11 +253,12 @@ describe Sip2::Client do
             with_ssl_server(port: port) do |server|
               Thread.new do
                 client = server.accept
+                client.gets "\r"
                 client.write "hey thereAY1AZFB1C\r"
                 client.close
               end
 
-              response = client.connect { |connection| connection.send_message 'hi' }
+              response = client.connect { |connection| connection.send_message "hi\r" }
               expect(response).to eq 'hey thereAY1AZFB1C'
             end
           end
