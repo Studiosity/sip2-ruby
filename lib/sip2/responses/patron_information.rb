@@ -130,8 +130,8 @@ module Sip2
 
       def inspect
         format(
-          '#<%<class_name>s:0x%<object_id>p @patron_valid="%<patron_valid>s"' \
-          ' @email="%<email>s" @authenticated="%<authenticated>s">',
+          '#<%<class_name>s:0x%<object_id>p @patron_valid="%<patron_valid>s" ' \
+          '@email="%<email>s" @authenticated="%<authenticated>s">',
           class_name: self.class.name,
           object_id: object_id,
           patron_valid: patron_valid?,

@@ -120,8 +120,8 @@ module Sip2
 
       def inspect
         format(
-          '#<%<class_name>s:0x%<object_id>p @online="%<online>s"' \
-          ' @protocol_version="%<protocol_version>s"',
+          '#<%<class_name>s:0x%<object_id>p @online="%<online>s" ' \
+          '@protocol_version="%<protocol_version>s"',
           class_name: self.class.name,
           object_id: object_id,
           online: online?,

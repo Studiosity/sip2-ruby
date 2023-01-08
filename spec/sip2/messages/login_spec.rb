@@ -5,7 +5,7 @@ require 'spec_helper'
 describe Sip2::Messages::Login do
   subject(:login_message) { described_class.new(connection) }
 
-  let(:connection) { instance_double 'Sip2::Connection' }
+  let(:connection) { instance_double Sip2::Connection }
 
   describe '#action_message' do
     subject(:action_message) do
