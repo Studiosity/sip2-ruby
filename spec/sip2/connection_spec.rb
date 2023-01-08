@@ -5,7 +5,7 @@ require 'spec_helper'
 describe Sip2::Connection do
   let(:socket) do
     instance_double(
-      'NonBlockingSocket',
+      Sip2::NonBlockingSocket,
       write: nil, gets: "default-result\r", connection_timeout: nil
     )
   end
@@ -118,7 +118,7 @@ describe Sip2::Connection do
 
   describe '#login' do
     it 'creates a Messages::Login and calls action_message' do
-      login_message = instance_double 'Sip2::Messages::Login'
+      login_message = instance_double Sip2::Messages::Login
       allow(Sip2::Messages::Login).to(
         receive(:new).
           with(connection).
@@ -138,7 +138,7 @@ describe Sip2::Connection do
   describe '#patron_information' do
     it 'creates a Messages::PatronInformation and calls action_message' do
       patron_information_message =
-        instance_double 'Sip2::Messages::PatronInformation'
+        instance_double Sip2::Messages::PatronInformation
       allow(Sip2::Messages::PatronInformation).to(
         receive(:new).
           with(connection).

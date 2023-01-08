@@ -8,7 +8,7 @@ describe Sip2::Client do
     let(:port) { 4321 }
 
     it 'yields sip connection' do # rubocop:disable RSpec/ExampleLength,RSpec/MultipleExpectations
-      socket = instance_double 'Sip2::NonBlockingSocket'
+      socket = instance_double Sip2::NonBlockingSocket
       allow(Sip2::NonBlockingSocket).to(
         receive(:connect).
           with(host: '127.0.0.1', port: 4321, timeout: 5).
@@ -22,7 +22,7 @@ describe Sip2::Client do
 
       expect(OpenSSL::SSL::SSLSocket).not_to receive(:new)
 
-      connection = instance_double 'Sip2::Connection'
+      connection = instance_double Sip2::Connection
       allow(Sip2::Connection).to(
         receive(:new).
           with(socket: socket, ignore_error_detection: false).
@@ -67,7 +67,7 @@ describe Sip2::Client do
       let(:client) { described_class.new(host: '123.123.123.123', port: 1234) }
 
       it 'passes the overridden port to socket initializer' do
-        socket = instance_double 'Sip2::NonBlockingSocket'
+        socket = instance_double Sip2::NonBlockingSocket
         allow(Sip2::NonBlockingSocket).to(
           receive(:connect).
             with(host: '123.123.123.123', port: 1234, timeout: 5).
@@ -87,13 +87,13 @@ describe Sip2::Client do
       let(:client) { described_class.new(host: '', port: 1, ignore_error_detection: true) }
 
       it 'passes error detection flag to connection' do # rubocop:disable RSpec/ExampleLength,RSpec/MultipleExpectations
-        socket = instance_double 'Sip2::NonBlockingSocket'
+        socket = instance_double Sip2::NonBlockingSocket
         allow(Sip2::NonBlockingSocket).to receive(:connect).and_return socket
         expect(Sip2::NonBlockingSocket).to receive(:connect)
         expect(socket).to receive(:close)
 
         # Test is the second parameter of the Connection initializer
-        connection = instance_double 'Sip2::Connection'
+        connection = instance_double Sip2::Connection
         allow(Sip2::Connection).to(
           receive(:new).
             with(socket: socket, ignore_error_detection: true).
@@ -114,7 +114,7 @@ describe Sip2::Client do
       let(:client) { described_class.new(host: '127.0.0.1', port: 567, timeout: 1122) }
 
       it 'passes the overridden timeout to socket initializer' do
-        socket = instance_double 'Sip2::NonBlockingSocket'
+        socket = instance_double Sip2::NonBlockingSocket
         allow(Sip2::NonBlockingSocket).to(
           receive(:connect).
             with(host: '127.0.0.1', port: 567, timeout: 1122).
@@ -136,7 +136,7 @@ describe Sip2::Client do
       let(:host) { 'sip2test.mooo.com' }
 
       it 'yields sip connection' do # rubocop:disable RSpec/ExampleLength,RSpec/MultipleExpectations
-        socket = instance_double 'Sip2::NonBlockingSocket'
+        socket = instance_double Sip2::NonBlockingSocket
         allow(Sip2::NonBlockingSocket).to(
           receive(:connect).
             with(host: 'sip2test.mooo.com', port: 4321, timeout: 5).
@@ -147,7 +147,7 @@ describe Sip2::Client do
             with(host: 'sip2test.mooo.com', port: 4321, timeout: 5)
         )
 
-        ssl_socket = instance_double 'OpenSSL::SSL::SSLSocket'
+        ssl_socket = instance_double OpenSSL::SSL::SSLSocket
         allow(OpenSSL::SSL::SSLSocket).to(
           receive(:new).
             with(socket, ssl_context).
@@ -164,7 +164,7 @@ describe Sip2::Client do
 
         expect(ssl_socket).to receive(:close)
 
-        connection = instance_double 'Sip2::Connection'
+        connection = instance_double Sip2::Connection
         allow(Sip2::Connection).to(
           receive(:new).
             with(socket: ssl_socket, ignore_error_detection: false).
