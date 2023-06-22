@@ -39,6 +39,19 @@ module Sip2
         )
       end
 
+      # Given a two letter code, return the value of that custom field.
+      #
+      # ex: response.custom_field('PT')
+      # => "2020"
+      #
+      # @param code [String] - The SIP2 code to return
+      # @return [String] - Returns a string if the code was found
+      # @return [nil] - Returns nil if no value was found
+      #
+      def custom_field(code)
+        parse_text(raw_response, code)
+      end
+
       private
 
       # Retrieve a text string from the response.
